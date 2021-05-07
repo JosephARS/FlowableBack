@@ -1,0 +1,87 @@
+{
+    "environment": {
+        "dockerImage": "java11-gradle",
+        "region": "us-east-1",
+        "imageTag": "latest",
+        "fileApiSpec": "api_spec.yaml",
+        "pathApiSpec": "."
+    },
+    "dockerfile": {
+        "app": "nombre-del-jar-0.0.1-SNAPSHOT.jar"
+    },
+    "dev": {
+        "cluster": "nombre-cluster-dev-ms-java-fargate",
+        "serviceName": "nombre-service-name-dev-java-fargate",
+        "securityGroups": "sg-0f1ed0e639ef19fb0",
+        "subnets": "subnet-0c03389b66f28e762,subnet-078783bec2d4ebce9",
+        "assignPublicIp": "ENABLED",
+        "taskDefinition": "nombre-task-definition-tsk",
+        "launchType": "FARGATE",
+        "taskCount": "2",
+        "repositoryUrl": "https://290296201161.dkr.ecr.us-east-1.amazonaws.com",
+        "repositoryImage": "290296201161.dkr.ecr.us-east-1.amazonaws.com/imagen-fargate"
+    },
+    "stage": {
+        "cluster": "nombre-cluster-dev-ms-java-fargate",
+        "serviceName": "nombre-service-name-dev-java-fargate",
+        "securityGroups": "sg-0f1ed0e639ef19fb0",
+        "subnets": "subnet-0c03389b66f28e762,subnet-078783bec2d4ebce9",
+        "assignPublicIp": "ENABLED",
+        "taskDefinition": "nombre-task-definition-tsk",
+        "launchType": "FARGATE",
+        "taskCount": "2",
+        "repositoryUrl": "https://290296201161.dkr.ecr.us-east-1.amazonaws.com",
+        "repositoryImage": "290296201161.dkr.ecr.us-east-1.amazonaws.com/imagen-fargate"
+    },
+    "prod": {
+        "cluster": "nombre-cluster-dev-ms-java-fargate",
+        "serviceName": "nombre-service-name-dev-java-fargate",
+        "securityGroups": "sg-0f1ed0e639ef19fb0",
+        "subnets": "subnet-0c03389b66f28e762,subnet-078783bec2d4ebce9",
+        "assignPublicIp": "ENABLED",
+        "taskDefinition": "nombre-task-definition-tsk",
+        "launchType": "FARGATE",
+        "taskCount": "2",
+        "repositoryUrl": "https://290296201161.dkr.ecr.us-east-1.amazonaws.com",
+        "repositoryImage": "290296201161.dkr.ecr.us-east-1.amazonaws.com/imagen-fargate"
+    },
+    "apigateway": {
+        "dev" : {
+            "name": "nombre-dev-api-gateway"
+        },
+        "stage": {
+            "name": "nombre-stage-api-gateway"
+        },
+        "prod": {
+            "name": "nombre-prod-api-gateway"
+        }
+    },
+    "swaggerParameters": {
+        "dev": {
+            "basePath": "https://url-load-balancer/{basePath}",
+            "uri" : "https://url-load-balancer/path-servicio/{proxy}"
+        },
+        "stage": {
+            "basePath": "https://url-load-balancer/{basePath}",
+            "uri" : "https://url-load-balancer/path-servicio/{proxy}"
+        },
+        "prod": {
+            "basePath": "https://url-load-balancer/{basePath}",
+            "uri" : "https://url-load-balancer/path-servicio/{proxy}"
+        }
+    },
+    "environments": {
+        "dev": {
+        "0": "testenv valor1",
+        "1" : "testenv valor2"
+        },
+        "stage": {
+        "0": "testenv valor1",
+        "1" : "testenv valor2"
+        },
+        "prod": {
+        "0": "testenv valor1",
+        "1" : "testenv valor2"
+        }
+    }
+}
