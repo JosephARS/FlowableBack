@@ -14,7 +14,19 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'javax.persistence:javax.persistence-api:2.2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	compileOnly "org.flowable:flowable-spring-boot-starter:6.6.0"
+	runtimeOnly 'mysql:mysql-connector-java:8.0.22'
+	
+	implementation 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+	
+	
 }
 
 test {
