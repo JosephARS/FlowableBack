@@ -1,0 +1,44 @@
+openapi: 3.0.0
+info:
+  version: '2016-09-12T23:19:28Z'
+  title: {title}
+paths:
+  '/flujos-indemnizaciones/{proxy+}':
+    x-amazon-apigateway-any-method:
+      parameters:
+        - name: proxy
+          in: path
+          required: true
+          schema:
+            type: string
+      responses: {}
+      security:
+        - ApiKeyAuth: []
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: '200'
+        requestParameters:
+          integration.request.path.proxy: method.request.path.proxy
+        responseParameters:
+          method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Requested-With,X-Requested-By,X-Api-Key,X-Amz-Security-Token'"
+          method.response.header.Access-Control-Allow-Methods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
+          method.response.header.Access-Control-Allow-Origin: "'*'"
+        uri: '{uri}'
+        passthroughBehavior: when_no_match
+        httpMethod: ANY
+        cacheNamespace: rbftud
+        cacheKeyParameters:
+          - method.request.path.proxy
+        type: http_proxy
+        connectionType: 'VPC_LINK'
+        connectionId: '{vpc_link}'
+servers:
+  - url: '{basePath}'
+    variables:
+      basePath:
+        default: /
+components:
+  schemas:
+    Empty:
+      type: object

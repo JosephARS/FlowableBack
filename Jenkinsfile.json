@@ -7,63 +7,65 @@
         "pathApiSpec": "."
     },
     "dockerfile": {
-        "app": "nombre-del-jar-0.0.1-SNAPSHOT.jar"
+        "app": "accesoclientes-flujos-indemnizaciones-ms-0.0.1-SNAPSHOT.jar"
     },
     "dev": {
-        "cluster": "nombre-cluster-dev-ms-java-fargate",
-        "serviceName": "nombre-service-name-dev-java-fargate",
-        "securityGroups": "sg-0f1ed0e639ef19fb0",
-        "subnets": "subnet-0c03389b66f28e762,subnet-078783bec2d4ebce9",
+        "cluster": "accesoclientes-dev-ecs-cluster",
+        "serviceName": "ecs-accesoclientes-flujos-indemnizaciones-service",
+        "securityGroups": "sg-05aaf1a8330d01e48",
+        "subnets": "subnet-0692fe9deae3d562e,subnet-058de19463fe738ed,subnet-05b680debc5b9caed",
         "assignPublicIp": "ENABLED",
-        "taskDefinition": "nombre-task-definition-tsk",
+        "taskDefinition": "ecs-accesoclientes-flujos-indemnizaciones-family",
         "launchType": "FARGATE",
-        "taskCount": "2",
-        "repositoryUrl": "https://290296201161.dkr.ecr.us-east-1.amazonaws.com",
-        "repositoryImage": "290296201161.dkr.ecr.us-east-1.amazonaws.com/imagen-fargate"
+        "taskCount": "1",
+        "repositoryUrl": "https://208680253351.dkr.ecr.us-east-1.amazonaws.com",
+        "repositoryImage": "208680253351.dkr.ecr.us-east-1.amazonaws.com/ecs-accesoclientes-flujos-indemnizaciones-service"
     },
     "stage": {
-        "cluster": "nombre-cluster-dev-ms-java-fargate",
-        "serviceName": "nombre-service-name-dev-java-fargate",
-        "securityGroups": "sg-0f1ed0e639ef19fb0",
-        "subnets": "subnet-0c03389b66f28e762,subnet-078783bec2d4ebce9",
+        "cluster": "accesoclientes-stage-ecs-cluster",
+        "serviceName": "ecs-accesoclientes-flujos-indemnizaciones-service",
+        "securityGroups": "sg-0e6184e70212d7a3e",
+        "subnets": "subnet-0fcfb580a49ad58d0,subnet-089190a56f3938b7f,subnet-0aaa6a51843c01993",
         "assignPublicIp": "ENABLED",
-        "taskDefinition": "nombre-task-definition-tsk",
+        "taskDefinition": "ecs-accesoclientes-flujos-indemnizaciones-family",
         "launchType": "FARGATE",
-        "taskCount": "2",
-        "repositoryUrl": "https://290296201161.dkr.ecr.us-east-1.amazonaws.com",
-        "repositoryImage": "290296201161.dkr.ecr.us-east-1.amazonaws.com/imagen-fargate"
+        "taskCount": "1",
+        "repositoryUrl": "https://829283809232.dkr.ecr.us-east-1.amazonaws.com",
+        "repositoryImage": "829283809232.dkr.ecr.us-east-1.amazonaws.com/ecs-accesoclientes-flujos-indemnizaciones-service"
     },
     "prod": {
-        "cluster": "nombre-cluster-dev-ms-java-fargate",
-        "serviceName": "nombre-service-name-dev-java-fargate",
+        "cluster": "accesoclientes-prod-ecs-cluster",
+        "serviceName": "ecs-accesoclientes-flujos-indemnizaciones-service",
         "securityGroups": "sg-0f1ed0e639ef19fb0",
         "subnets": "subnet-0c03389b66f28e762,subnet-078783bec2d4ebce9",
         "assignPublicIp": "ENABLED",
-        "taskDefinition": "nombre-task-definition-tsk",
+        "taskDefinition": "ecs-accesoclientes-flujos-indemnizaciones-family",
         "launchType": "FARGATE",
         "taskCount": "2",
         "repositoryUrl": "https://290296201161.dkr.ecr.us-east-1.amazonaws.com",
-        "repositoryImage": "290296201161.dkr.ecr.us-east-1.amazonaws.com/imagen-fargate"
+        "repositoryImage": "290296201161.dkr.ecr.us-east-1.amazonaws.com/ecs-accesoclientes-flujos-indemnizaciones-service"
     },
     "apigateway": {
         "dev" : {
-            "name": "nombre-dev-api-gateway"
+            "name": "accesoclientes-dev-api"
         },
         "stage": {
-            "name": "nombre-stage-api-gateway"
+            "name": "accesoclientes-stage-api"
         },
         "prod": {
-            "name": "nombre-prod-api-gateway"
+            "name": "accesoclientes-prod-api"
         }
     },
     "swaggerParameters": {
         "dev": {
-            "basePath": "https://url-load-balancer/{basePath}",
-            "uri" : "https://url-load-balancer/path-servicio/{proxy}"
+            "basePath": "http://internal-accesoclientes-dev-alb-79196404.us-east-1.elb.amazonaws.com/{basePath}",
+            "uri" : "http://internal-accesoclientes-dev-alb-79196404.us-east-1.elb.amazonaws.com/flujos-indemnizaciones/{proxy}",
+            "vpc_link":"h8wofg"
         },
         "stage": {
-            "basePath": "https://url-load-balancer/{basePath}",
-            "uri" : "https://url-load-balancer/path-servicio/{proxy}"
+            "basePath": "http://internal-accesoclientes-stage-alb-1895130356.us-east-1.elb.amazonaws.com/{basePath}",
+            "uri" : "http://internal-accesoclientes-stage-alb-1895130356.us-east-1.elb.amazonaws.com/flujos-indemnizaciones/{proxy}",
+            "vpc_link":"s9jf3i"
         },
         "prod": {
             "basePath": "https://url-load-balancer/{basePath}",
@@ -72,16 +74,16 @@
     },
     "environments": {
         "dev": {
-        "0": "testenv valor1",
-        "1" : "testenv valor2"
+            "0": "ENV_PREFIX dev",
+            "1" : "testenv valor2"
         },
         "stage": {
-        "0": "testenv valor1",
-        "1" : "testenv valor2"
+            "0": "ENV_PREFIX stg",
+            "1" : "testenv valor2"
         },
         "prod": {
-        "0": "testenv valor1",
-        "1" : "testenv valor2"
+            "0": "ENV_PREFIX prod",
+            "1" : "testenv valor2"
         }
     }
 }

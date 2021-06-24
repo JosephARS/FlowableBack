@@ -14,6 +14,5 @@ public interface ConsecutivosRepository extends JpaRepository<Consecutivos, Stri
 	@Procedure("p_crear_consecutivo")
 	String P_CREAR_CONSECUTIVO(String id_Flowable);
 	
-//	@Query(value = "{call p_crear_consecutivo(:id_flowable)}", nativeQuery = true)
-//	Consecutivos crearCaso(@Param("id_flowable") String id_flowable);
+
 }

@@ -15,12 +15,10 @@ public class Consecutivos {
 	@Id
 	String idConsecutivo;
 	String idFlowable;
-	BigDecimal sqlErr;
 	
-	public Consecutivos(String idConsecutivo, String idFlowable, BigDecimal sqlErr) {
+	public Consecutivos(String idConsecutivo, String idFlowable) {
 		this.idConsecutivo = idConsecutivo;
 		this.idFlowable = idFlowable;
-		this.sqlErr = sqlErr;
 	}
 	
 	public Consecutivos() {

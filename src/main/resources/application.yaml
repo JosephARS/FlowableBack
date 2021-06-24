@@ -1,0 +1,27 @@
+spring:
+  profiles:
+    name: test-YAML
+    environment: test
+    notificacionEventos: "https://fz73xehwah.execute-api.us-east-1.amazonaws.com/dev/notificacion/api/v1/mensajeria/eventos/mensajes"
+    
+  jpa:    database: mysql
+    show-sql: true
+  datasource:    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/flowable_pruebas?autoReconnect=true&serverTimezone=America/Bogota
+    username: Desarrollo
+    password: Segurosb123
+
+server:
+  port: 80
+  address: 0.0.0.0
+  servlet:
+    context-path: /flujos-indemnizaciones
+    
+   
+management:
+  endpoints:
+    web:
+      base-path: /health
+
+info:
+  status: UP

@@ -1,6 +1,7 @@
 package com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.model;
 
 import java.util.Date;
+import java.util.Map;
 
 
 public class Procesos {
@@ -12,6 +13,7 @@ public class Procesos {
 	String IdCasoPropio;
 	Date FechaInicio;
 	String UsuarioCreador;
+	Map<String, Object> VariablesCaso;
 	
 	public String getIdProceso() {
 		return IdProceso;
@@ -36,6 +38,12 @@ public class Procesos {
 	}
 	public void setUsuarioCreador(String usuarioCreador) {
 		UsuarioCreador = usuarioCreador;
+	}
+	public Map<String, Object> getVariablesCaso() {
+		return VariablesCaso;
+	}
+	public void setVariablesCaso(Map<String, Object> variablesCaso) {
+		VariablesCaso = variablesCaso;
 	}
 
 }
