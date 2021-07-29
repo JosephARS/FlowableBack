@@ -3,13 +3,14 @@ package com.bolivar.accesoclientes.flujos.indemnizaciones.anulacionCaso.controll
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bolivar.accesoclientes.flujos.indemnizaciones.anulacionCaso.model.Anulacion;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.anulacionCaso.service.AnulacionCasoService;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.model.ResponseWS;
+import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.Anulacion;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -27,10 +28,11 @@ public class AnulacionCasoController {
 	
 	AnulacionCasoService anulacionCasoService;
 	
-    @DeleteMapping("/procesos/anular/{IdProceso}")
-    public ResponseWS anularCaso(@PathVariable("IdProceso") String processId, @RequestBody Anulacion anulacion){    	
+    @PutMapping("/procesos/anular/{IdProceso}")
+    public ResponseWS anularCaso(@PathVariable("IdProceso") String idProceso,
+    							@RequestBody Anulacion datosAnulacion){    	
     	
-    	ResponseWS oResponseWS = anulacionCasoService.anularCaso(processId, anulacion);
+    	ResponseWS oResponseWS = anulacionCasoService.anularCaso(idProceso, datosAnulacion);
 		return oResponseWS;
     	
     	

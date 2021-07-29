@@ -9,10 +9,8 @@ import javax.persistence.Id;
 import lombok.Data;
 
 @Data
-@Entity
 public class Consecutivos {
 
-	@Id
 	String idConsecutivo;
 	String idFlowable;
 	

@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import com.bolivar.accesoclientes.flujos.indemnizaciones.notificacionEventos.model.Dato;
@@ -27,6 +28,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Component
 public class HandlerNotificacionCrearCaso implements JavaDelegate {
 
 	@Autowired
@@ -46,6 +48,7 @@ public class HandlerNotificacionCrearCaso implements JavaDelegate {
 			String urlString = "https://fz73xehwah.execute-api.us-east-1.amazonaws.com/dev/notificacion/api/v1/mensajeria/eventos/mensajes";
 
 			//String urlString = env.getProperty(NOTIFICACION_EVENTOS);
+			
 			System.out.println("URL:" + urlString);
 
 			HttpHeaders headers = new HttpHeaders();
@@ -67,7 +70,7 @@ public class HandlerNotificacionCrearCaso implements JavaDelegate {
 			Grupo grupo0 = new Grupo("0", datos);
 
 			datos = Arrays.asList();
-			datos = Arrays.asList(new Dato("PARA", "joseph.rodriguez@segurosbolivar.com"),
+			datos = Arrays.asList(new Dato("PARA", (String) execution.getVariable("email")),
 					new Dato("IDENTIFICACION", "1026262691"), new Dato("TIPODOC", "CC"));
 
 			Grupo grupo1 = new Grupo("1", datos);

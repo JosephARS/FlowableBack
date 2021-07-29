@@ -3,13 +3,27 @@ spring:
     name: test-YAML
     environment: test
     notificacionEventos: "https://fz73xehwah.execute-api.us-east-1.amazonaws.com/dev/notificacion/api/v1/mensajeria/eventos/mensajes"
-    
+
   jpa:    database: mysql
     show-sql: true
+
   datasource:    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/flowable_pruebas?autoReconnect=true&serverTimezone=America/Bogota
+    url: jdbc:mysql://localhost:3306/flowable_pruebas?autoReconnect=true&serverTimezone=America/Bogota&nullCatalogMeansCurrent=true
     username: Desarrollo
     password: Segurosb123
+
+
+indemnizaciones:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/indemnizaciones?autoReconnect=true&serverTimezone=America/Bogota&nullCatalogMeansCurrent=true
+    username: Desarrollo
+    password: Segurosb123
+  jpa:
+    database: mysql
+    show-sql: true
+
+
 
 server:
   port: 80

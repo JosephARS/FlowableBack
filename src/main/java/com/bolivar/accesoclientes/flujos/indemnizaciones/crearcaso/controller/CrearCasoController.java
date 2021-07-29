@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.model.NuevoCaso;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.model.ResponseWS;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.service.CrearCasoService;
+import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.VariablesProceso;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -39,10 +40,10 @@ public class CrearCasoController {
     }
     
     @PostMapping(path = "/casos")
-    public ResponseWS registrarNuevoCaso(@RequestBody NuevoCaso nuevoCaso) {
-    	ResponseWS oResponseWS = crearCasoService.registrarNuevoCaso(nuevoCaso);
+    public ResponseWS registrarNuevoCaso(@RequestBody VariablesProceso procesoIndemnizacion) {
+    	ResponseWS oResponseWS = crearCasoService.registrarNuevoCaso(procesoIndemnizacion);
     	if (oResponseWS.getResultado() != null) {
-        	String consecutivo = oResponseWS.getResultado().getIdConsecutivo();
+        	String consecutivo = oResponseWS.getResultado().toString();
         	log.info("Caso creado " + consecutivo);
 		}
 

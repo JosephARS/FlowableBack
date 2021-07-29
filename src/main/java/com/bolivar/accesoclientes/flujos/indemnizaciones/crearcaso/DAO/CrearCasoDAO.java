@@ -4,12 +4,15 @@ import java.util.List;
 
 import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.model.NuevoCaso;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.model.ResponseWS;
+import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.VariablesProceso;
 
 public interface CrearCasoDAO {
 	
-	public ResponseWS registrarNuevoCaso(NuevoCaso nuevoCaso);
+
 	
 	public List<Object> trazaHistoricoProceso(String processId);
+
+	public ResponseWS registrarNuevoCaso(VariablesProceso procesoIndemnizacion);
 
 }
 

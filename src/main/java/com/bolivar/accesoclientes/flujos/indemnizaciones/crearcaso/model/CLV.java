@@ -5,7 +5,7 @@ import java.io.Serializable;
 import lombok.Data;
 
 @Data
-public class CanalCreacion implements Serializable {
+public class CLV implements Serializable {
 	
 	/**
 	 * 
@@ -14,5 +14,4 @@ public class CanalCreacion implements Serializable {
 
 	String codigo;
 	String valor;
-
 }
