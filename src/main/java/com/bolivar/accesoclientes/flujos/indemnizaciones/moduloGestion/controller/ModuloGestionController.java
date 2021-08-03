@@ -134,17 +134,42 @@ public class ModuloGestionController {
     	return oResponseWS;
     }
     
-    @PostMapping("/usuario/tareaAtendida/{idTarea}/{idTareaDefinicion}")
+    @PostMapping("/usuario/tareaAtendida/{idTarea}/{idTareaDefinicion}/{idUsuario}")
     public ResponseWS completarTarea(@PathVariable("idTarea") String idTarea,
 							    		@PathVariable("idTareaDefinicion") String idTareaDefinicion,
+							    		@PathVariable("idUsuario") String idUsuario,
 							    		@RequestBody VariablesProceso variablesProceso) {
 										
     	ResponseWS oResponseWS = new ResponseWS();
     	
-    	oResponseWS = moduloGestionService.completarTarea(idTarea, idTareaDefinicion, variablesProceso);
+    	oResponseWS = moduloGestionService.completarTarea(idTarea, idTareaDefinicion, idUsuario, variablesProceso);
     	
     	return oResponseWS;
     	
     }
+    
+    @GetMapping("/procesos/historialCaso/{idProceso}")
+    public ResponseWS obtenerHistorialCaso(@PathVariable("idProceso")String idProceso) {
+    	
+    	ResponseWS oResponseWS = new ResponseWS();
+    	
+    	oResponseWS = moduloGestionService.obtenerHistorialCaso(idProceso);
+    			
+    	return oResponseWS;
+    }
+    
+    @GetMapping("/busqueda/{parametroBusqueda}/{valorBusqueda}/{itemPorPagina}/{primerItem}")
+    public ResponseWS busquedaGeneral(@PathVariable("parametroBusqueda")String parametroBusqueda,
+						    		@PathVariable("valorBusqueda")String valorBusqueda,
+									@PathVariable("itemPorPagina") Integer itemPorPagina,
+									@PathVariable("primerItem") Integer primerItem) {
+    	
+    	ResponseWS oResponseWS = new ResponseWS();
+    	
+    	oResponseWS = moduloGestionService.busquedaGeneral(parametroBusqueda, valorBusqueda, itemPorPagina, primerItem);
+    			
+    	return oResponseWS;
+    }
+    
     
 }

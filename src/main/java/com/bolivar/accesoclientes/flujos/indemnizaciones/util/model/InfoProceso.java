@@ -28,8 +28,11 @@ public class InfoProceso {
 	ObjCodigoValor resultadoScoreRiesgo;
 	ObjCodigoValor clasificacionCaso;	//Codigo-Valor
 	ObjCodigoValor resultadoMotorDefi;				//Codigo-Valor
-	ObjCodigoValor cambioMotorDefi;				//Codigo-Valor
-	String motivoCambioMotorDefi;
+	ObjCodigoValor cambioMotorDef;				//Codigo-Valor
+	String motivoCambioMotorDef;
 	String resultadoPruebaEstres;
-	List<Documento> documentos; 
+	List<Documento> documentos;	  
+	String resultadoEvidencia;
+	Date fechaDesistimiento ;
+	String varProducto;
 }

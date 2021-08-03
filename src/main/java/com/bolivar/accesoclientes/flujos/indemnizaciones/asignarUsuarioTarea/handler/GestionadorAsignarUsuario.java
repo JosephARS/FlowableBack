@@ -7,7 +7,7 @@ import java.util.Random;
 
 import org.flowable.engine.TaskService;
 import org.flowable.engine.delegate.TaskListener;
-
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.service.delegate.DelegateTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -43,6 +43,8 @@ public class GestionadorAsignarUsuario implements TaskListener {
 		  
 		delegateTask.setOwner(usuarioAsignado);
 		delegateTask.setAssignee(usuarioAsignado);
+		delegateTask.addUserIdentityLink(usuarioAsignado, IdentityLinkType.ASSIGNEE);
+		delegateTask.addUserIdentityLink(usuarioAsignado, IdentityLinkType.OWNER);
 		delegateTask.addCandidateUser(usuarioAsignado);
 		
 		int respuesta = usuariosRepository.P_ACTUALIZAR_USUARIO_ASIGNADO(idProceso, usuarioAsignado);

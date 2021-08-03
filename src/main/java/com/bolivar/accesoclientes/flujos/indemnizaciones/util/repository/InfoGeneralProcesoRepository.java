@@ -24,11 +24,18 @@ public interface InfoGeneralProcesoRepository extends JpaRepository<InfoGeneralP
 	@Procedure("p_anular_caso")
 	Integer P_ANULAR_CASO(String id_Proceso, String datos_anulacion);
 	
+	@Query(value = "call p_buscar_proceso(:parametroBusqueda, :valorBusqueda, :itemPorPagina, :primerItem)",nativeQuery = true)
+	List<InfoGeneralProceso> P_BUSCAR_PROCESO(@Param("parametroBusqueda") String parametroBusqueda,@Param("valorBusqueda")  String valorBusqueda,@Param("itemPorPagina")  Integer itemPorPagina,@Param("primerItem")  Integer primerItem );
+//	@Procedure(name="p_buscar_proceso")
+//	List<InfoGeneralProceso> P_BUSCAR_PROCESO(String parametroBusqueda, String valorBusqueda, Integer itemPorPagina, Integer primerItem );
+	
 	List<InfoGeneralProceso> findByIdentificacionAsegurado(String identificacionAsegurado);
 	
 	List<InfoGeneralProceso> findByIdProcesoIn(List<String> idProceso);
 	
 	Optional<InfoGeneralProceso> findByIdProceso(String idProceso);
+	
+	
 	
 	@Modifying
     @Query(value = "update info_general_proceso set documento = JSON_INSERT(documento, \"$.pago\", JSON_OBJECT(\"valorPago\", :valorPago)) where idProceso = :idProceso" , nativeQuery = true)

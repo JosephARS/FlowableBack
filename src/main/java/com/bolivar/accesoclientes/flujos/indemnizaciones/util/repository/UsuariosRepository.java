@@ -14,4 +14,7 @@ public interface UsuariosRepository extends JpaRepository<Usuario, Integer>{
 
 	@Procedure("p_actualizar_usuario_asignado")
 	Integer P_ACTUALIZAR_USUARIO_ASIGNADO(String id_proceso, String usuario_asignado);
+	
+	@Procedure("p_tarea_cerrada")
+	Integer P_TAREA_CERRADA(String usuario_asignado, String tipo_cierre);
 }

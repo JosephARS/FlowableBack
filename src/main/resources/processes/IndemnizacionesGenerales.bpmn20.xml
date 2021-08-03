@@ -7,7 +7,7 @@
     <extensionElements>
       <flowable:eventListener events="PROCESS_CANCELLED" delegateExpression="${handlerFinInstancia}"></flowable:eventListener>
     </extensionElements>
-    <startEvent id="inicioFlujoGenerales" flowable:formFieldValidation="true"></startEvent>
+    <startEvent id="inicioFlujoGenerales" name="Inicio nuevo proceso" flowable:formFieldValidation="true"></startEvent>
     <serviceTask id="NotificacionClienteCreacionDeCaso" name="Notificacion Cliente Creacion De Caso" flowable:delegateExpression="${handlerNotificacionCrearCaso}"></serviceTask>
     <endEvent id="sid-9389723C-4735-40AF-A8A8-BF9E670153A4"></endEvent>
     <sequenceFlow id="sid-002F96AD-A4E3-4ACE-822B-A1F89CF8733A" sourceRef="NotificacionClienteCreacionDeCaso" targetRef="sid-9389723C-4735-40AF-A8A8-BF9E670153A4"></sequenceFlow>
