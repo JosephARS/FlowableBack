@@ -2,6 +2,7 @@ package com.bolivar.accesoclientes.flujos.indemnizaciones.calculadoraLiquidacion
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,6 +25,7 @@ import com.bolivar.accesoclientes.flujos.indemnizaciones.calculadoraLiquidacion.
 import com.bolivar.accesoclientes.flujos.indemnizaciones.calculadoraLiquidacion.model.RequestCalculadoraDTO;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.calculadoraLiquidacion.model.ResponseCalculadoraDTO;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.model.NuevoCaso;
+import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.EstadoSolicitud;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.InfoGeneralProceso;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.repository.InfoGeneralProcesoRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -84,7 +87,13 @@ public class HandlerCalculadoraLiquidacion implements JavaDelegate {
 			long codRamo = 117;
 			Long numPol1 = (Long) obtenerProceso.get().getDocumento().getInfoProducto().getNumeroPoliza();
 			long codRies = 1;
-			Date fechaSini = fecha.parse("06-01-2019");
+			Date fechaSini = null;
+			try {
+				fechaSini = fecha.parse("06-01-2019");
+			} catch (ParseException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			long codCausa = 129;
 			long codCons = 74;
 			long codCob = 351;
@@ -97,9 +106,9 @@ public class HandlerCalculadoraLiquidacion implements JavaDelegate {
 			proceso.setProceso(3);
 			System.out.println(fechaSini);
 
-			String urlString = "https://fz73xehwah.execute-api.us-east-1.amazonaws.com/dev/poliza/api/v1/siniestros/calculadora";
+			//String urlString = "https://fz73xehwah.execute-api.us-east-1.amazonaws.com/dev/poliza/api/v1/siniestros/calculadora";
 
-			//String urlString = env.getProperty(NOTIFICACION_EVENTOS);
+			String urlString = env.getProperty(CALCULADORA_LIQUIDACION);
 			System.out.println("URL:" + urlString);
 
 			HttpHeaders headers = new HttpHeaders();
@@ -133,20 +142,27 @@ public class HandlerCalculadoraLiquidacion implements JavaDelegate {
 			
 			HttpEntity<RequestCalculadoraDTO> httpEntity = new HttpEntity<>(requestCalculadora, headers);
 			ResponseCalculadoraDTO result = restTemplate.postForObject(urlString, httpEntity, ResponseCalculadoraDTO.class);
-			log.info(result.toString());
+			
+			if (result.getCodRespuesta() < 1) {
+				log.info(result.getCodRespuesta().toString());
+			}
+			
+
 			log.info("Consulta de calculadora liquidacion: " + result);
 			
 			if (result.getValIndemnizar() != null) {
 				System.out.println(result.getValIndemnizar());
 				int res = infoProcesoRepository.updateValorByIdProceso(idProceso, result.getValIndemnizar());
-				System.out.println(res);
+				int respuesta2 = infoProcesoRepository.P_ACTUALIZAR_ESTADO(idProceso, EstadoSolicitud.PAGO);
+				System.out.println(res); 
 			}
 
 			
 		} catch (Exception e) {
 			log.error("Error en calculadora liquidacion " + " | " + e.getMessage() + " | " + e.getClass() + " | "
-					+ e.getLocalizedMessage());
-		}
+					+ e.getLocalizedMessage() );
+
+		} 
 	}
 
 }

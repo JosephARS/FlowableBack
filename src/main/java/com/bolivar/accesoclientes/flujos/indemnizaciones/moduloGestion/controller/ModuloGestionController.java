@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -171,5 +172,30 @@ public class ModuloGestionController {
     	return oResponseWS;
     }
     
+    
+    @GetMapping("/procesos/usuarios/{idTareaDefinicion}")
+    public ResponseWS listarUsuarios(@PathVariable("idTareaDefinicion")String idTareaDefinicion) {
+        	
+    	return moduloGestionService.listarUsuarios(idTareaDefinicion);
+    }
+    
+    
+    @PutMapping("/procesos/reasignar/{idProceso}/{idUsuario}/{idTarea}")
+    public ResponseWS reasignarUsuario(@PathVariable("idProceso")String idProceso,
+    									@PathVariable("idUsuario") String idUsuario,
+    									@PathVariable("idTarea") String idTarea) {
+        	
+    	return moduloGestionService.reasignarUsuario(idProceso, idUsuario, idTarea);
+    }
+    
+    @PutMapping("/usuarios/gestion/{idUsuario}/{estado}")
+    public ResponseWS cambiarEstadoUsuario(@PathVariable("idUsuario") Integer idUsuario, @PathVariable("estado") Integer estado ) {
+    	return moduloGestionService.cambiarEstadoUsuario(idUsuario, estado);
+    }
+    
+    @PostMapping("/corregirActividad")
+	public ResponseWS corregirActividadAnterior(@RequestBody VariablesProceso variablesProceso) {
+		return moduloGestionService.corregirActividadAnterior(variablesProceso);
+	}
     
 }

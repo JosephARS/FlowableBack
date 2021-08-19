@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.lang.NonNull;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sun.istack.NotNull;
 
@@ -25,6 +26,7 @@ public class InfoProceso {
 	String usuarioCreador;
 	Date fechaCreacion;
 	String estadoSolicitud;
+	String estadoFinal;
 	ObjCodigoValor resultadoScoreRiesgo;
 	ObjCodigoValor clasificacionCaso;	//Codigo-Valor
 	ObjCodigoValor resultadoMotorDefi;				//Codigo-Valor

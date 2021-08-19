@@ -26,6 +26,7 @@ import com.bolivar.accesoclientes.flujos.indemnizaciones.util.repository.InfoGen
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.repository.UsuariosRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -61,7 +62,7 @@ public class AnulacionCasoService implements AnulacionCasoDAO {
 		for (Task tarea : tareasActivas) {
 			
 			System.out.println("Asignado: " + tarea.getAssignee());
-			usuariosRepository.P_TAREA_CERRADA(tarea.getAssignee(), "Anulada");
+			usuariosRepository.P_TAREA_CERRADA(tarea.getAssignee() == null ? "":tarea.getAssignee(), "Anulada");
 		}
 		
 //		List<ActivityInstance> tareasActivas2 = runtimeService.createActivityInstanceQuery().processInstanceId(idProceso).unfinished().activityType("userTask").list();
@@ -76,6 +77,7 @@ public class AnulacionCasoService implements AnulacionCasoDAO {
 		runtimeService.deleteProcessInstance(idProceso, datosAnulacion.getMotivoAnulacion());
 		
 		ObjectMapper mapper = new ObjectMapper();
+		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 		try {
 			log.info("procesoIndemnizacion: "+ mapper.writeValueAsString(datosAnulacion));
 			infoProcesoRepository.P_ANULAR_CASO(idProceso, mapper.writeValueAsString(datosAnulacion));

@@ -3,6 +3,7 @@ spring:
     name: test-YAML
     environment: test
     notificacionEventos: "https://fz73xehwah.execute-api.us-east-1.amazonaws.com/dev/notificacion/api/v1/mensajeria/eventos/mensajes"
+    calculadoraLiquidacion: "https://fz73xehwah.execute-api.us-east-1.amazonaws.com/dev/poliza/api/v1/siniestros/calculadora"
 
   jpa:    database: mysql
     show-sql: true
@@ -12,6 +13,11 @@ spring:
     username: Desarrollo
     password: Segurosb123
 
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: America/Bogota
+    date-format: yyyy-MM-dd HH:mm:ss
 
 indemnizaciones:
   datasource:

@@ -24,6 +24,6 @@ public class Usuario implements Serializable{
 	String identificacion;
 	String loginUsuario;
 	int activo;
-	int areasActivas;
+	int tareasActivas;
 	int tareasCerradas;
 }

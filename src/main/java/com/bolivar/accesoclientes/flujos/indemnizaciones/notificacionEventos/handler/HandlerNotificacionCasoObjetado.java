@@ -1,15 +1,11 @@
 package com.bolivar.accesoclientes.flujos.indemnizaciones.notificacionEventos.handler;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -24,12 +20,11 @@ import com.bolivar.accesoclientes.flujos.indemnizaciones.notificacionEventos.mod
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class HandlerNotificacionCrearCaso implements JavaDelegate {
+public class HandlerNotificacionCasoObjetado implements JavaDelegate {
 
 	@Autowired
 	private Environment env;
@@ -45,9 +40,9 @@ public class HandlerNotificacionCrearCaso implements JavaDelegate {
 
 			String idConsecutivo = (String) execution.getVariable("idConsecutivo");
 
-			//String urlString = "https://fz73xehwah.execute-api.us-east-1.amazonaws.com/dev/notificacion/api/v1/mensajeria/eventos/mensajes";
+			String urlString = "https://fz73xehwah.execute-api.us-east-1.amazonaws.com/dev/notificacion/api/v1/mensajeria/eventos/mensajes";
 
-			String urlString = env.getProperty(NOTIFICACION_EVENTOS);
+			//String urlString = env.getProperty(NOTIFICACION_EVENTOS);
 			
 			System.out.println("URL:" + urlString);
 

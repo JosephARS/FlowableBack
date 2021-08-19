@@ -30,4 +30,14 @@ public interface ModuloGestionDAO {
 	//Completar tareas
 	public ResponseWS completarTarea(String idTarea, String idTareaDefinicion, String idUsuario, VariablesProceso variablesProceso);
 	
+	//Gestion de usuario
+	public ResponseWS listarUsuarios(String idTareaDefinicion);
+	
+	public ResponseWS cambiarEstadoUsuario(Integer idUsuario, Integer estado);
+	
+	public ResponseWS reasignarUsuario(String idProceso, String usuarioAsignado, String idTarea);
+	
+	public ResponseWS corregirActividadAnterior(VariablesProceso variablesProceso);
+	
+	
 }

@@ -18,6 +18,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'javax.persistence:javax.persistence-api:2.2'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.4'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	compileOnly "org.flowable:flowable-spring-boot-starter:6.6.0"
 	runtimeOnly 'mysql:mysql-connector-java:8.0.22'

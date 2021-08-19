@@ -6,13 +6,14 @@ import org.flowable.engine.delegate.ExecutionListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.EstadoSolicitud;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.repository.InfoGeneralProcesoRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class HandlerFinInstancia implements ExecutionListener{
+public class HandlerFinInstanciaObjetado implements ExecutionListener{
     
 	
 	@Autowired
@@ -26,7 +27,7 @@ public class HandlerFinInstancia implements ExecutionListener{
 		String idProceso = execution.getProcessInstanceId();
 
 		
-		infoProcesoRepository.P_FINALIZAR_PROCESO(idProceso, "");
+		infoProcesoRepository.P_FINALIZAR_PROCESO(idProceso, EstadoSolicitud.OBJETADO);
 		
 		log.info("Se ha finalizado una Instancia " + execution.getProcessInstanceId() + execution.getEventName() + execution.getCurrentActivityId());
 	}

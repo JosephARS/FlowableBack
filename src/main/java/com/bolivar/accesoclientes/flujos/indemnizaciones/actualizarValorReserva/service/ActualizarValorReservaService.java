@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.VariablesProceso;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.repository.InfoGeneralProcesoRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -30,8 +32,25 @@ public class ActualizarValorReservaService {
 		log.info(respuesta.toString(), valorActual.toString());
 		
 		if (respuesta != valorActual) {
+			
+			String idProceso = variablesProceso.getInfoProceso().getIdProceso();
+			
+			ObjectMapper mapper = new ObjectMapper();
+			try {
+				log.info("procesoIndemnizacion: "+ mapper.writeValueAsString(variablesProceso.getSiniestro()));
+				infoProcesoRepository.actualizarValorReserva(idProceso, mapper.writeValueAsString(variablesProceso.getSiniestro()));
+			} catch (JsonProcessingException e) {
+				log.error(e.getMessage(), e.getCause());
+				e.printStackTrace();
+			}	
+			
+			
 			//infoProcesoRepository.updateValorReserva(variablesProceso.getInfoProceso().getIdProceso(), respuesta);
-			System.out.println(infoProcesoRepository.updateValorReserva(variablesProceso.getInfoProceso().getIdProceso(), respuesta, tipoEvento));
+			//System.out.println(infoProcesoRepository.updateValorReserva(idProceso, respuesta, tipoEvento));
+			
+			//System.out.println(infoProcesoRepository.actualizarValorReserva(idProceso, respuesta, tipoEvento));
+			
+			
 			return true;
 		}else {
 			return false;

@@ -1,5 +1,7 @@
 package com.bolivar.accesoclientes.flujos.indemnizaciones.util.model;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -18,19 +20,21 @@ public class VariablesProceso {
 	//Caso caso;
 	Siniestro siniestro;
 	
-	@JsonInclude(JsonInclude.Include.NON_NULL)
+		@JsonInclude(JsonInclude.Include.NON_NULL)
 	CanalAtencion canalAtencion;
 	
-	@JsonInclude(JsonInclude.Include.NON_NULL)
+		@JsonInclude(JsonInclude.Include.NON_NULL)
 	Pago pago;
 	
-	@JsonInclude(JsonInclude.Include.NON_NULL)
+		@JsonInclude(JsonInclude.Include.NON_NULL)
 	Anulacion anulacion;
 	
-	@JsonInclude(JsonInclude.Include.NON_NULL)
+		@JsonInclude(JsonInclude.Include.NON_NULL)
 	Objecion objecion;
 	
-	@JsonInclude(JsonInclude.Include.NON_NULL)
+		@JsonInclude(JsonInclude.Include.NON_NULL)
 	Ajustador ajustador;
 	
+		@JsonInclude(JsonInclude.Include.NON_NULL)
+	List<HistorialAnalisis> historialAnalisis;
 }

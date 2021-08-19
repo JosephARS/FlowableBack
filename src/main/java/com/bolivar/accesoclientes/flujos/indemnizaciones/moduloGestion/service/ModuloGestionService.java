@@ -2,67 +2,63 @@ package com.bolivar.accesoclientes.flujos.indemnizaciones.moduloGestion.service;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.Process;
-import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricActivityInstance;
-import org.flowable.engine.history.HistoricActivityInstanceQuery;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ActivityInstance;
-import org.flowable.engine.runtime.ActivityInstanceQuery;
-import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.runtime.ProcessInstanceQuery;
+import org.flowable.engine.task.Comment;
 import org.flowable.eventsubscription.api.EventSubscription;
-import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkInfo;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
-import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.flowable.task.api.history.HistoricTaskLogEntry;
-import org.flowable.task.api.history.HistoricTaskLogEntryQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 
 import com.bolivar.accesoclientes.flujos.indemnizaciones.actualizarValorReserva.service.ActualizarValorReservaService;
-import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.model.EstadoCaso;
+import com.bolivar.accesoclientes.flujos.indemnizaciones.asignarUsuarioTarea.model.Usuario;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.model.Procesos;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.model.ResponseWS;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.model.TipoRespuesta;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.moduloGestion.DAO.ModuloGestionDAO;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.moduloGestion.model.Actividad;
-import com.bolivar.accesoclientes.flujos.indemnizaciones.moduloGestion.model.Identificacion;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.moduloGestion.model.TareasCantidad;
-import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.Anulacion;
-import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.CanalCreacion;
-import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.EstadoCreacion;
+import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.Ajustador;
+import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.CanalAtencion;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.InfoGeneralProceso;
+import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.InfoProceso;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.ObjCodigoValor;
-import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.TareaDefinicion;
+import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.Objecion;
+import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.Pago;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.VariablesProceso;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.repository.InfoGeneralProcesoRepository;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.repository.UsuariosRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import liquibase.pro.packaged.iF;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -89,14 +85,32 @@ public class ModuloGestionService implements ModuloGestionDAO {
 		ResponseWS oResponseWS = new ResponseWS();
 
 		List<Object> oTareaList = new ArrayList<Object>();
+		
+		List<Task> tareas;
+		
+		long totalTareas = 0;
+		
+		Date fechaActual = new Date();
 
 		try {
-			List<Task> tareas = taskService.createTaskQuery().taskAssignee(nombreUsuario).taskName(nombreTarea)
-					.includeProcessVariables().orderByTaskCreateTime().desc()
-					// .list();
-					.listPage(primerItem, itemPorPagina);
+			
+			if (nombreTarea.equals("Todas")) {				//Retornar todas las tareas asignadas a un usuario.
+				System.out.println(nombreUsuario + nombreTarea);
+				tareas = taskService.createTaskQuery().taskAssignee(nombreUsuario)//.taskAssigneeLikeIgnoreCase(nombreUsuario)
+						.includeProcessVariables().orderByTaskCreateTime().desc()
+						// .list();
+						.listPage(primerItem, itemPorPagina);
 
-			long totalTareas = taskService.createTaskQuery().taskAssignee(nombreUsuario).taskName(nombreTarea).count();
+				totalTareas = taskService.createTaskQuery().taskAssignee(nombreUsuario).count();
+				
+			} else {										//Retornar tareas de un nombre especifico asignadas a un usuario.
+				tareas = taskService.createTaskQuery().taskAssignee(nombreUsuario).taskName(nombreTarea)
+						.includeProcessVariables().orderByTaskCreateTime().desc()
+						// .list();
+						.listPage(primerItem, itemPorPagina);
+
+				totalTareas = taskService.createTaskQuery().taskAssignee(nombreUsuario).taskName(nombreTarea).count();
+			}
 
 			System.out.println(tareas);
 
@@ -109,15 +123,24 @@ public class ModuloGestionService implements ModuloGestionDAO {
 				map.put("idTareaDefinicion", tarea.getTaskDefinitionKey());
 				map.put("nombreTarea", tarea.getName());
 				map.put("fechaCreacion", tarea.getCreateTime());
-				map.put("fechaSolucion", tarea.getCreateTime());
+				map.put("fechaSolucion", tarea.getDueDate());
+				map.put("estadoSolucion", calcularTiempoSolucion(fechaActual, tarea.getDueDate()));
 
 				oTareaList.add(map);
 
 			}
+			
+			if (totalTareas>0) {
+				oResponseWS.setTotalItems(totalTareas);
+				oResponseWS.setListaResultado(oTareaList);
+				oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
+			}else {
+				oResponseWS.setTotalItems(totalTareas);
+				oResponseWS.setMensaje("No se encontraron datos para el usuario: " + nombreUsuario );
+				oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
+			}
+			
 
-			oResponseWS.setTotalItems(totalTareas);
-			oResponseWS.setListaResultado(oTareaList);
-			oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
 
 		} catch (Exception e) {
 			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
@@ -154,7 +177,6 @@ public class ModuloGestionService implements ModuloGestionDAO {
 
 			tareas.forEach(tarea -> {
 				conteoTareas.add(tarea.getName());
-				conteoTareas.add("Tarea 2");
 			});
 
 			Map<Object, Long> couterMap = conteoTareas.stream()
@@ -294,19 +316,6 @@ public class ModuloGestionService implements ModuloGestionDAO {
 				DefinicionProceso = activity.getProcessDefinitionId();
 				oProcesoList.add(oActividad);
 
-//	                System.out.println("\n" + "IdProceso: " + activity.getProcessInstanceId() 
-//	                					+ "\n /Asignado: " + activity.getAssignee() 
-//	                					+ "\n /TaskId: " + activity.getTaskId()
-//	                					+ "\n /Nombre: " + activity.getActivityName() 
-//	                					+ "\n /Tiempo: " + activity.getDurationInMillis() + " milliseconds " 
-//	                					+ "\n /Inicio: " + activity.getStartTime() 
-//	                					+ "\n /Fin: " + activity.getEndTime() 
-//	                					+ "\n /Tipo: " + activity.getActivityType()
-//	                					+ "\n /TransaccionOrden: " + activity.getTransactionOrder()
-//	                					+ "\n /processDefinitionId: " + activity.getProcessDefinitionId());
-
-				// }
-
 			}
 
 			RepositoryService repositoryService = processEngine.getRepositoryService();
@@ -397,7 +406,7 @@ public class ModuloGestionService implements ModuloGestionDAO {
 
 	@Override
 	public ResponseWS obtenerListaProcesosHistorico(Boolean procesosFinalizados, Integer itemPorPagina,
-			Integer primerItem) { // Mostrar todos los proceso ya finalizos o con tareas asignadas a usuarios
+			Integer primerItem) { // Mostrar todos los proceso ya finalizados o con tareas asignadas a usuarios
 
 		ResponseWS oResponseWS = new ResponseWS();
 
@@ -442,35 +451,6 @@ public class ModuloGestionService implements ModuloGestionDAO {
 
 				}
 
-//		        List<Task> tareas = taskService.createTaskQuery()
-//		                //.taskAssignee(nombreUsuario)
-//		        		//.taskName(nombreTarea)
-//		                .includeProcessVariables()
-//		                .orderByTaskCreateTime()
-//		                .desc()
-//		                //.list();
-//		                .listPage(primerItem, itemPorPagina);
-//		        
-//		        totalProcesos = taskService.createTaskQuery()
-//		                //.taskAssignee(nombreUsuario)
-//		        		//.taskName(nombreTarea)
-//		        		.count();     
-//	        
-//		        System.out.println(tareas);
-//		        
-//		        for (Task tarea : tareas) {		
-//	
-//		            Map<String, Object> map = new LinkedHashMap<>();
-//		            map.put("idConsecutivo", tarea.getProcessVariables().get("idConsecutivo"));
-//		            map.put("idProceso", tarea.getProcessInstanceId());
-//		            map.put("idTarea", tarea.getId());            
-//		            map.put("nombreTarea", tarea.getName());
-//		            map.put("fechaCreacion", tarea.getCreateTime());
-//		            map.put("fechaSolucion", tarea.getCreateTime());
-//		            
-//		            oProcesoList.add(map);
-//		        
-//		        }
 			} else { // Se listan solo procesos ya finalizados, no anulados.
 
 				HistoryService historyService = processEngine.getHistoryService();
@@ -534,13 +514,13 @@ public class ModuloGestionService implements ModuloGestionDAO {
 
 		try {
 
-			List<HistoricProcessInstance> procesos = historyService.createHistoricProcessInstanceQuery() // Se obtienen
-																											// los
-																											// procesos
-																											// ya
-																											// finalizados
+			List<HistoricProcessInstance> procesos = historyService.createHistoricProcessInstanceQuery() // Se obtienen los procesos ya	finalizados
 					// .variableValueEquals("numeroDocumento", identificacion)
-					.includeProcessVariables().deleted().listPage(primerItem, itemPorPagina);
+					.includeProcessVariables()
+					.deleted()
+					.orderByProcessInstanceEndTime()
+					.desc()
+					.listPage(primerItem, itemPorPagina);
 			// .list();
 
 			long totalProcesos = historyService.createHistoricProcessInstanceQuery() // Se valida los procesos creados
@@ -549,13 +529,24 @@ public class ModuloGestionService implements ModuloGestionDAO {
 					// .variableValueEquals("numeroDocumento", identificacion)
 					.deleted().count();
 
+			
+			List<String> listaIdProcesos = new ArrayList<String>();
+			
+			procesos.forEach(proceso -> {
+				listaIdProcesos.add(proceso.getId());
+	        });
+			
+			List<InfoGeneralProceso> listaResultado = infoProcesoRepository.findByIdProcesoIn(listaIdProcesos);
+			
 			for (HistoricProcessInstance proceso : procesos) {
+				
+				InfoGeneralProceso anulacion = listaResultado.stream().filter(p -> p.getIdProceso().equals(proceso.getId())).collect(Collectors.toList()).get(0);
 
 				Map<String, Object> map = new LinkedHashMap<>();
 				map.put("idConsecutivo", proceso.getProcessVariables().get("idConsecutivo"));
-				// map.put("anulacion", (Anulacion)
-				// proceso.getProcessVariables().get("Anulacion"));
+				map.put("anulacion", anulacion.getDocumento().getAnulacion());
 				map.put("motivoAnulacion", proceso.getDeleteReason());
+				map.put("fechaCreacion", proceso.getStartTime());
 				map.put("fechaAnulacion", proceso.getEndTime());
 
 				oProcesoList.add(map);
@@ -646,14 +637,47 @@ public class ModuloGestionService implements ModuloGestionDAO {
 		// TareaDefinicion tarea = TareaDefinicion.valueOf(idTareaDefinicion);
 		Map<String, Object> variables = new HashMap<String, Object>();
 		System.out.println(idTareaDefinicion);
+		String idProceso = variablesProceso.getInfoProceso().getIdProceso();
+		String comentario = "";
+		ObjectMapper mapper = new ObjectMapper();
 
 		try {
 			switch (idTareaDefinicion) {
 			case "userTask_CreacionCasoStellent":
 
+				CanalAtencion canalAtencion = variablesProceso.getCanalAtencion();
+				
+
+				try {
+					log.info("procesoIndemnizacion: "+ mapper.writeValueAsString(canalAtencion));
+					infoProcesoRepository.creacionCasoStellent(idProceso, mapper.writeValueAsString(canalAtencion));
+				} catch (JsonProcessingException e) {
+					log.error(idTareaDefinicion, e.getMessage(), e.getCause());
+					e.printStackTrace();
+				}
+				String lineaAtencion = variablesProceso.getCanalAtencion().getLineaAtencion();
+				variables.put("lineaAtencion", lineaAtencion);
+				taskService.complete(idTarea, variables);
+				usuariosRepository.P_TAREA_CERRADA(idUsuario, "Completada");
+				
 				break;
 			case "userTask_ConceptoAnalisisCaso":
-
+				
+				InfoProceso infoProceso = variablesProceso.getInfoProceso();
+				
+				try {
+					log.info("procesoIndemnizacion: "+ mapper.writeValueAsString(infoProceso));
+					infoProcesoRepository.conceptoAnalisisCaso(idProceso, mapper.writeValueAsString(infoProceso));
+				} catch (JsonProcessingException e) {
+					log.error(idTareaDefinicion, e.getMessage(), e.getCause());
+					e.printStackTrace();
+				}
+				ObjCodigoValor cambioMotorDef = variablesProceso.getInfoProceso().getCambioMotorDef();
+				variables.put("cambioMotorDef", cambioMotorDef);
+				log.info(idTarea);
+				taskService.complete(idTarea, variables);
+				usuariosRepository.P_TAREA_CERRADA(idUsuario, "Completada");
+				
 				break;
 			case "userTask_ActualizacionValorReserva":
 				System.out.println(idTareaDefinicion);
@@ -669,7 +693,7 @@ public class ModuloGestionService implements ModuloGestionDAO {
 					log.info(tipoEvento, valorReserva, idTareaDefinicion);
 					variables.put("valorReserva", valorReserva);
 					//taskService.addUserIdentityLink(idTarea, idUsuario, "assignee");
-					taskService.complete(idTarea);
+					taskService.complete(idTarea, variables);
 					usuariosRepository.P_TAREA_CERRADA(idUsuario, "Completada");
 				} else {
 					oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
@@ -679,15 +703,89 @@ public class ModuloGestionService implements ModuloGestionDAO {
 
 				break;
 			case "userTask_ValidacionLiquidacion":
+				Pago pago = variablesProceso.getPago();
+				comentario = variablesProceso.getPago().getConcepto();
+				try {
+					log.info("procesoIndemnizacion: "+ mapper.writeValueAsString(pago));
+					infoProcesoRepository.validacionLiquidacion(idProceso, mapper.writeValueAsString(pago));
+				} catch (JsonProcessingException e) {
+					log.error(idTareaDefinicion, e.getMessage(), e.getCause());
+					e.printStackTrace();
+				}
+				
+				taskService.addComment(idTarea, idProceso, comentario);
+				taskService.complete(idTarea);
+				usuariosRepository.P_TAREA_CERRADA(idUsuario, "Completada");
 
 				break;
 			case "userTask_LevantamientoControlSimon":
-
+				Pago pago2 = variablesProceso.getPago();
+				try {
+					log.info("procesoIndemnizacion: "+ mapper.writeValueAsString(pago2));
+					infoProcesoRepository.validacionLiquidacion(idProceso, mapper.writeValueAsString(pago2));
+				} catch (JsonProcessingException e) {
+					log.error(idTareaDefinicion, e.getMessage(), e.getCause());
+					e.printStackTrace();
+				}
+				
+				taskService.complete(idTarea);
+				usuariosRepository.P_TAREA_CERRADA(idUsuario, "Completada");
 				break;
 			case "userTask_ExplicacionCasoObjetado":
+				Objecion objecion = variablesProceso.getObjecion();
+				comentario = variablesProceso.getObjecion().getObservacion();
+				
+				try {
+					log.info("procesoIndemnizacion: "+ mapper.writeValueAsString(objecion));
+					infoProcesoRepository.explicacionCasoObjetado(idProceso, mapper.writeValueAsString(objecion));
+				} catch (JsonProcessingException e) {
+					log.error(idTareaDefinicion, e.getMessage(), e.getCause());
+					e.printStackTrace();
+				}
+				taskService.addComment(idTarea, idProceso, comentario);
+				taskService.complete(idTarea);
+				usuariosRepository.P_TAREA_CERRADA(idUsuario, "Completada");
 
 				break;
 			case "userTask_AnalisisCasoObjetado":
+				InfoProceso infoProceso2 = variablesProceso.getInfoProceso();
+				
+				ObjCodigoValor resultadoMotor = variablesProceso.getInfoProceso().getResultadoMotorDefi();
+				String cambioResultadoMotor = variablesProceso.getInfoProceso().getCambioMotorDef().getValor();
+
+				if (cambioResultadoMotor == null || cambioResultadoMotor.isBlank()) {
+					log.info("resultadoMotor: " + resultadoMotor);
+					infoProceso2.setCambioMotorDef(resultadoMotor);
+				}
+				
+				try {
+					log.info("procesoIndemnizacion: "+ mapper.writeValueAsString(infoProceso2));
+					infoProcesoRepository.conceptoAnalisisCaso(idProceso, mapper.writeValueAsString(infoProceso2));
+				} catch (JsonProcessingException e) {
+					log.error(idTareaDefinicion, e.getMessage(), e.getCause());
+					e.printStackTrace();
+				}
+
+				ObjCodigoValor cambioMotorDef2 = variablesProceso.getInfoProceso().getCambioMotorDef();
+
+				variables.put("cambioMotorDef", cambioMotorDef2);
+				taskService.complete(idTarea, variables);
+				usuariosRepository.P_TAREA_CERRADA(idUsuario, "Completada");
+				break;
+			case "userTask_AsignarAjustador":
+				Ajustador ajustador = variablesProceso.getAjustador();
+				
+
+				try {
+					log.info("procesoIndemnizacion: "+ mapper.writeValueAsString(ajustador));
+					infoProcesoRepository.asignarAjustador(idProceso, mapper.writeValueAsString(ajustador));
+				} catch (JsonProcessingException e) {
+					log.error(idTareaDefinicion, e.getMessage(), e.getCause());
+					e.printStackTrace();
+				}
+
+				taskService.complete(idTarea);
+				usuariosRepository.P_TAREA_CERRADA(idUsuario, "Completada");
 
 				break;
 			default:
@@ -699,8 +797,7 @@ public class ModuloGestionService implements ModuloGestionDAO {
 		} catch (Exception e) {
 			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
 			oResponseWS.setMensaje("Error completando la tarea " + idTareaDefinicion);
-			log.error("Error completando la tarea " + idTareaDefinicion + e.getMessage() + " | " + e.getClass() + " | "
-					+ e.getCause());
+			log.error("Error completando la tarea " + idTareaDefinicion + e.getMessage() + " | " + e.getClass() + " | "	+ e.getCause());
 		}
 
 		return oResponseWS;
@@ -717,11 +814,17 @@ public class ModuloGestionService implements ModuloGestionDAO {
 		HistoryService historyService = processEngine.getHistoryService();
 
 		String usuario = "";
+		
+		String comentario = "";
 
 		try {
 			List<HistoricActivityInstance> actividades = historyService.createHistoricActivityInstanceQuery()
-					.processInstanceId(idProceso).orderByHistoricActivityInstanceStartTime()
-					.orderByHistoricActivityInstanceId().asc().list();
+					.processInstanceId(idProceso)
+					.orderByHistoricActivityInstanceStartTime()
+					.asc()
+					.orderByHistoricActivityInstanceId()
+					.asc()
+					.list();
 
 			for (HistoricActivityInstance actividad : actividades) {
 
@@ -743,12 +846,18 @@ public class ModuloGestionService implements ModuloGestionDAO {
 																				.list();
 
 						for (HistoricTaskInstance tarea : tareasHistorico) {
+
+							List<Comment> listaComentarios = taskService.getTaskComments(actividad.getTaskId());
+							if (listaComentarios.size() > 0) {
+								comentario = listaComentarios.get(0).getFullMessage();
+							}
+							
 							
 							for (IdentityLinkInfo idinfo : tarea.getIdentityLinks()) {
 
+								
 								if (idinfo.getType().equals(IdentityLinkType.ASSIGNEE) || idinfo.getType().equals(IdentityLinkType.CANDIDATE)) {
 									usuario = (idinfo.getUserId() != null) ? idinfo.getUserId() : "";
-									System.out.println("Usuario "+usuario);
 									break;									
 								}		
 							}
@@ -767,10 +876,10 @@ public class ModuloGestionService implements ModuloGestionDAO {
 				map.put("fechaFin", actividad.getEndTime());
 				map.put("tiempoSolucion", actividad.getDurationInMillis());
 				map.put("tipoActividad", actividad.getActivityType());
+				map.put("comentario", comentario);
 				usuario = "";
+				comentario="";
 				oProcesoList.add(map);
-				int contador =+ 1;
-				System.out.println(contador+" " + map);
 
 			}
 			oResponseWS.setListaResultado(oProcesoList);
@@ -830,16 +939,26 @@ public class ModuloGestionService implements ModuloGestionDAO {
 				break;
 
 			case "numeroSiniestro":
+				
+				List<InfoGeneralProceso> resultadoProcesos = null;
+				System.out.println("entra");
+				try {
+					System.out.println("entra2");
+					resultadoProcesos = infoProcesoRepository.P_BUSCAR_PROCESO(parametroBusqueda,
+							valorBusqueda, itemPorPagina, primerItem);
+					System.out.println(resultadoProcesos);
+				} catch (Exception e) {
+					log.error("NO DATOS" + e.getMessage() + "|" + e.getCause() + e.getLocalizedMessage());
+					break;
+				} 
 
-				List<InfoGeneralProceso> resultadoProcesos = infoProcesoRepository.P_BUSCAR_PROCESO(parametroBusqueda,
-						valorBusqueda, itemPorPagina, primerItem);
-
-				resultadoProcesos.forEach(proceso -> {
-					listaProcesos.add(proceso.getIdProceso());
-				});
-
-				System.out.println(resultadoProcesos);
 				if (resultadoProcesos.size() > 0) {
+					
+					resultadoProcesos.forEach(proceso -> {
+						listaProcesos.add(proceso.getIdProceso());
+					});
+					System.out.println(listaProcesos);
+				
 					procesos = historyService.createHistoricProcessInstanceQuery()
 							.processInstanceIds(listaProcesos)
 							.includeProcessVariables()
@@ -858,7 +977,7 @@ public class ModuloGestionService implements ModuloGestionDAO {
 			}
 
 			if (totalItems > 0) {
-
+System.out.println("Control");
 				for (HistoricProcessInstance proceso : procesos) {
 
 					if (proceso.getEndTime() != null) { // Proceso finalizado
@@ -917,6 +1036,146 @@ public class ModuloGestionService implements ModuloGestionDAO {
 		}
 
 		return oResponseWS;
+	}
+	
+	
+	public ResponseWS listarUsuarios(String idTareaDefinicion) {
+		
+		ResponseWS oResponseWS = new ResponseWS();
+
+		List<Usuario> oListUsuarios = new ArrayList<Usuario>();
+		
+		try {
+			oListUsuarios =  usuariosRepository.P_LISTAR_USUARIOS(idTareaDefinicion);
+			List<Object> oListUsuarios2 = new ArrayList<Object>(oListUsuarios);
+			
+			oResponseWS.setListaResultado(oListUsuarios2);
+			oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
+			log.info("Lista de usuarios asignables " + idTareaDefinicion);
+			
+		} catch (Exception e) {
+			String mensajeError = "Error listando usuarios "  + idTareaDefinicion + e.getMessage() + " | " + e.getClass() + " | " + e.getCause();
+			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
+			oResponseWS.setMensaje("Error listando usuarios " + idTareaDefinicion);
+			log.error(mensajeError);
+		}		
+		return oResponseWS;		
+	}
+	
+	
+	public ResponseWS reasignarUsuario(String idProceso, String usuarioAsignado, String idTarea) {
+		
+		ResponseWS oResponseWS = new ResponseWS();
+		
+		try {
+			taskService.setAssignee(idTarea, usuarioAsignado);
+			taskService.addUserIdentityLink(idTarea, usuarioAsignado, IdentityLinkType.ASSIGNEE );
+			taskService.addUserIdentityLink(idTarea, usuarioAsignado, IdentityLinkType.OWNER);
+			taskService.addCandidateUser(idTarea, usuarioAsignado);
+			
+			usuariosRepository.P_REASIGNAR_USUARIO(idProceso, usuarioAsignado);
+			
+			oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
+			oResponseWS.setMensaje("Reasignacion de tarea realizada con exito");
+	    	log.info("Tarea reasignada" + usuarioAsignado);
+			
+		} catch (Exception e) {
+			String mensajeError = "Error reasignando usuario "  + usuarioAsignado + " " + idProceso + e.getMessage() + " | " + e.getClass() + " | " + e.getCause();
+			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
+			oResponseWS.setMensaje("Error reasignando usuario " + usuarioAsignado);
+			log.error(mensajeError);
+		}		
+		return oResponseWS;	
+		
+	}
+	
+	public ResponseWS cambiarEstadoUsuario(Integer idUsuario, Integer estado) {
+		
+		ResponseWS oResponseWS = new ResponseWS();
+		System.out.println("Estado: " + idUsuario + estado);
+		
+		try {
+			System.out.println("Estado: " + idUsuario + estado);
+			int respuesta = usuariosRepository.P_CAMBIAR_ESTADO_USUARIO(idUsuario, estado);
+			
+			if (respuesta == 0) {
+				oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
+				oResponseWS.setMensaje("Cambio de estado exitoso");
+		    	log.info("Cambio de estado exitoso" + idUsuario);
+			} else if (respuesta == 2) {
+				oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
+				oResponseWS.setMensaje("No es posible desactivar todos los usuarios de un grupo/rol existente. Debe existir al menos uno activo para asignacion de tareas.");
+		    	log.info("Cambio de estado exitoso" + idUsuario);
+			}
+			
+
+			
+		} catch (Exception e) {
+			String mensajeError = "Error cambiando estado de usuario "  + idUsuario + " " + estado + e.getMessage() + " | " + e.getClass() + " | " + e.getCause();
+			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
+			oResponseWS.setMensaje("Error cambiando estado de usuario ");
+			log.error(mensajeError);
+		}		
+		return oResponseWS;	
+		
+	}
+	
+	public ResponseWS corregirActividadAnterior(VariablesProceso variablesProceso) {
+		
+		ResponseWS oResponseWS = new ResponseWS();
+		String idProceso = variablesProceso.getInfoProceso().getIdProceso();
+		String idUsuario = variablesProceso.getCanalAtencion().getResponsable();
+		
+		runtimeService.createChangeActivityStateBuilder()
+		.processInstanceId(idProceso)
+		.moveActivityIdTo("userTask_CreacionCasoStellent", "userTask_ConceptoAnalisisCaso")
+		.changeState();
+		
+		usuariosRepository.P_TAREA_CERRADA(idUsuario, "Anulada");
+		
+		oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
+		
+		return oResponseWS;
+	}
+	
+	public Map<String, String> calcularTiempoSolucion(Date fechaInicio, Date fechaFin) {
+
+	    Map<String, String> map = new HashMap<String, String>();
+	    
+	    String tiempo = "";
+	    String estadoSolucion = "";
+
+	    System.out.println("FEchas: " + fechaInicio + " | " + fechaFin );
+	    
+	    if(fechaFin != null){
+	    	
+		    Long diffTime = (fechaFin.getTime() - fechaInicio.getTime());
+			long h = TimeUnit.MILLISECONDS.toHours(diffTime);
+			long m = Math.abs(TimeUnit.MILLISECONDS.toMinutes(diffTime) % 60);
+			long s = Math.abs(TimeUnit.MILLISECONDS.toSeconds(diffTime) % 60);
+			String h1 = String.format("%02d" , h);
+			String m1 = String.format("%02d" , m);
+			String s1 = String.format("%02d" , s);
+          
+         if(diffTime > 0){
+        	 estadoSolucion = "Vigente";
+           if(h<47){
+        	   estadoSolucion = "Pronto";
+           }
+         }else{
+           estadoSolucion = "Vencido";
+         }
+          
+	      tiempo = h1+":"+m1 +":"+s1;
+	      
+
+
+	    }    
+	      map.put("tiempo", tiempo);
+	      map.put("estado", estadoSolucion);
+	      System.out.println(map);
+		return map;
+						
 	}
 
 }

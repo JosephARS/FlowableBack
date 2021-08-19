@@ -1,12 +1,14 @@
 package com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.IdentityService;
@@ -30,6 +32,8 @@ import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.VariablesPro
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.repository.InfoGeneralProcesoRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -44,7 +48,6 @@ public class CrearCasoService implements CrearCasoDAO {
 
 	public static final String PROCESS_DEFINITION_KEY = "idIndemnizacionesGen";
 	public static String USUARIO_CREADOR = "";
-	
 
 	RuntimeService runtimeService;
 	TaskService taskService;
@@ -133,8 +136,10 @@ public class CrearCasoService implements CrearCasoDAO {
 				variables.put("clasificacionCaso", procesoIndemnizacion.getInfoProceso().getClasificacionCaso());
 				variables.put("valorReserva", procesoIndemnizacion.getSiniestro().getValorReserva());
 				variables.put("numeroDocumento", procesoIndemnizacion.getAsegurado().getNumeroDocumento());
-				variables.put("ordenPagoBloqueada", false);	//Validar este dato de donde se obtiene
-				variables.put("controlTecnico", false);		//Validar este dato de donde se obtiene				
+				variables.put("ordenPagoBloqueada", true);	//Validar este dato de donde se obtiene
+				variables.put("controlTecnico", false);		//Validar este dato de donde se obtiene		
+				variables.put("sarlaftActualizado", true);		//Validar este dato de donde se obtiene	
+				//variables.put("resultadoMotorDefi", procesoIndemnizacion.getInfoProceso().getResultadoMotorDefi());
 				
 				
 				procesoIndemnizacion.getInfoProceso().setFechaCreacion(new Date());
@@ -144,29 +149,7 @@ public class CrearCasoService implements CrearCasoDAO {
 					procesoIndemnizacion.getSiniestro().setFechaFormalizacion(new Date());
 				}
 				
-//				variables.put("fechaSiniestro", procesoIndemnizacion.getSiniestro().getFechaSiniestro());				
-//				variables.put("tipoDocumento", procesoIndemnizacion.getAsegurado().getTipoDocumento());
-//				variables.put("numeroDocumento", procesoIndemnizacion.getAsegurado().getNumeroDocumento());
-//				variables.put("nombres", procesoIndemnizacion.getAsegurado().getNombres());
-//				variables.put("apellidos", procesoIndemnizacion.getAsegurado().getApellidos());
-//				variables.put("compañia", procesoIndemnizacion.getInfoProducto().getCompania());
-//				variables.put("ramoProducto", procesoIndemnizacion.getInfoProducto().getRamoProducto());
-//				variables.put("producto", procesoIndemnizacion.getInfoProducto().getProducto());
-//				variables.put("numeroPoliza", procesoIndemnizacion.getInfoProducto().getNumeroPoliza());				
-//				variables.put("causa", procesoIndemnizacion.getInfoProducto().getCausa());
-//				variables.put("consecuencia", procesoIndemnizacion.getInfoProducto().getConsecuencia());
-//				variables.put("cobertura", procesoIndemnizacion.getInfoProducto().getCobertura());
-//				variables.put("riesgo", procesoIndemnizacion.getInfoProducto().getRiesgo());
-//				variables.put("resultadoScoreRiesgo", procesoIndemnizacion.getInfoProceso().getResultadoScoreRiesgo());
-//				variables.put("resultadoMotorDefi", procesoIndemnizacion.getInfoProceso().getResultadoMotorDefi());
-//				variables.put("documentos", procesoIndemnizacion.getInfoProceso().getDocumentos());
-//				variables.put("usuarioCreador", USUARIO_CREADOR);
-//				variables.put("CLV", procesoIndemnizacion.getAsegurado().getClv());
-//				variables.put("numeroContacto", procesoIndemnizacion.getAsegurado().getNumeroContacto());
-//				variables.put("email", procesoIndemnizacion.getAsegurado().getEmail());
-//				variables.put("numeroSiniestro", procesoIndemnizacion.getSiniestro().getNumeroSiniestro());				
-//				variables.put("valorPretension", procesoIndemnizacion.getSiniestro().getValorPretension());
-				
+
 				identityService.setAuthenticatedUserId(USUARIO_CREADOR);
 				
 				log.info("VariablesIn: " + variables);
@@ -179,6 +162,10 @@ public class CrearCasoService implements CrearCasoDAO {
 					oConsecutivos.setIdFlowable(processInstance.getId());
 					System.out.println("PROCESO:" + processInstance.getId().toString());
 					ObjectMapper mapper = new ObjectMapper();
+					mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+				    //.setDateFormat(df)
+					mapper.registerModule(new JavaTimeModule());
+					
 					try {
 						log.info("procesoIndemnizacion: "+ mapper.writeValueAsString(procesoIndemnizacion));
 					} catch (JsonProcessingException e) {

@@ -1,21 +1,19 @@
-package com.bolivar.accesoclientes.flujos.indemnizaciones.crearSiniestroSimon.handler;
+package com.bolivar.accesoclientes.flujos.indemnizaciones.solicitarInfoAdicional.handler;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
 
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-@Data
 @Slf4j
 @Component
-public class GestionarCrearSiniestroSimon implements JavaDelegate{
+public class HandlerAccesoClienteInfoAdicional implements JavaDelegate{
 	 
 	@Override
 	    public void execute(DelegateExecution execution) {
 			
-		log.info("Se ha creado Siniestro en Simon");
+		log.info("Se ha solicitado a acceso cliente informacion adicional");
 		}
 
 }

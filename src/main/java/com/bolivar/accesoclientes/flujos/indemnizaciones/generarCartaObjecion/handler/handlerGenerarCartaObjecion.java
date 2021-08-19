@@ -1,21 +1,18 @@
-package com.bolivar.accesoclientes.flujos.indemnizaciones.crearSiniestroSimon.handler;
+package com.bolivar.accesoclientes.flujos.indemnizaciones.generarCartaObjecion.handler;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
 
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-@Data
 @Slf4j
 @Component
-public class GestionarCrearSiniestroSimon implements JavaDelegate{
+public class handlerGenerarCartaObjecion implements JavaDelegate{
 	 
 	@Override
 	    public void execute(DelegateExecution execution) {
 			
-		log.info("Se ha creado Siniestro en Simon");
+		log.info("Se ha generado carta de objecion");
 		}
-
 }
