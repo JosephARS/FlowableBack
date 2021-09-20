@@ -83,7 +83,10 @@ public class HandlerNotificacionCasoObjetado implements JavaDelegate {
 
 			HttpEntity<RequestEventosDTO> httpEntity = new HttpEntity<>(request, headers);
 			ResponseEventosDTO result = restTemplate.postForObject(urlString, httpEntity, ResponseEventosDTO.class);
-			log.info(result.toString());
+			
+			if (result != null) {
+				log.info(result.toString());
+			}
 			log.info("Se ha enviado correo al cliente: " + idConsecutivo);
 			
 		} catch (Exception e) {

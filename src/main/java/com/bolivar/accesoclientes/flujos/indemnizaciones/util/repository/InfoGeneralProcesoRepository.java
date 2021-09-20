@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.InfoGeneralProceso;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.ObjCodigoValor;
+import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.Tarea;
 
 @Repository
 public interface InfoGeneralProcesoRepository extends JpaRepository<InfoGeneralProceso, Long>{
@@ -59,9 +60,7 @@ public interface InfoGeneralProcesoRepository extends JpaRepository<InfoGeneralP
 	@Procedure("p_actualizar_secc_pago")
 	Integer validacionLiquidacion(String idProceso, String pago);
 	
-	
-	
-	
+		
 	
 	
 /******QUERYS PARA ACTUALIZAR CAMPOS ESPECIFICOS ******/	
@@ -73,13 +72,18 @@ public interface InfoGeneralProcesoRepository extends JpaRepository<InfoGeneralP
 	@Modifying
     @Query(value = "update info_general_proceso set documento = JSON_SET(documento, \"$.siniestro.valorReserva\", :valorReserva, \"$.siniestro.tipoEvento\", :tipoEvento) where idProceso = :idProceso" , nativeQuery = true)
     int updateValorReserva(@Param("idProceso") String idProceso, @Param ("valorReserva") Long valorReserva, @Param("tipoEvento") String tipoEvento);
+	
+	@Transactional
+	@Modifying
+    @Query(value = "update info_general_proceso set documento = JSON_SET(documento, \"$.siniestro.numeroSiniestro\", :numeroSiniestro) where idProceso = :idProceso" , nativeQuery = true)
+    int updateNumeroSiniestro(@Param("idProceso") String idProceso, @Param ("numeroSiniestro") Long numeroSiniestro);
 		
 	@Procedure("p_actualizar_motor_def")
 	Integer P_ACTUALIZAR_MOTOR_DEF(String id_Proceso, String infoGeneral);
-
 	
-
-
+	@Procedure("p_ingresar_analisis")
+	Integer P_INGRESAR_ANALISIS(String id_Proceso, String infoGeneral);
+	
 
 	
 }

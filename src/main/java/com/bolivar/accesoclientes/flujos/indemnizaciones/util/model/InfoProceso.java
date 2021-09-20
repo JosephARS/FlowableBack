@@ -3,15 +3,12 @@ package com.bolivar.accesoclientes.flujos.indemnizaciones.util.model;
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.lang.NonNull;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.sun.istack.NotNull;
-
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 @Data
@@ -21,13 +18,21 @@ public class InfoProceso {
 
 	String idProceso;
 	String idConsecutivo;
+	@Valid
+	@NotNull(message = "El campo estadoCreacion no puede ser nulo.")
 	ObjCodigoValor estadoCreacion;			//Codigo-Valor
+	@Valid
+	@NotNull(message = "El campo canalCreacion no puede ser nulo.")
 	ObjCodigoValor canalCreacion;	//Codigo-Valor
 	String usuarioCreador;
 	Date fechaCreacion;
 	String estadoSolicitud;
 	String estadoFinal;
+	@Valid
+	@NotNull(message = "El campo resultadoScoreRiesgo no puede ser nulo.")
 	ObjCodigoValor resultadoScoreRiesgo;
+	@Valid
+	@NotNull(message = "El campo clasificacionCaso no puede ser nulo.")
 	ObjCodigoValor clasificacionCaso;	//Codigo-Valor
 	ObjCodigoValor resultadoMotorDefi;				//Codigo-Valor
 	ObjCodigoValor cambioMotorDef;				//Codigo-Valor

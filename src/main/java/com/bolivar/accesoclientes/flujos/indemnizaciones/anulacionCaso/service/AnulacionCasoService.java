@@ -1,19 +1,13 @@
 package com.bolivar.accesoclientes.flujos.indemnizaciones.anulacionCaso.service;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.flowable.engine.IdentityService;
 import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.runtime.ActivityInstance;
-import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,7 +39,7 @@ public class AnulacionCasoService implements AnulacionCasoDAO {
 	UsuariosRepository usuariosRepository;
 //	IdentityService identityService;
 //	IdentityLink identityLink;
-//	ProcessEngine processEngine;
+	ProcessEngine processEngine;
 	
 	@Override
 	public ResponseWS anularCaso(String idProceso, Anulacion datosAnulacion) {
@@ -63,6 +57,33 @@ public class AnulacionCasoService implements AnulacionCasoDAO {
 			
 			System.out.println("Asignado: " + tarea.getAssignee());
 			usuariosRepository.P_TAREA_CERRADA(tarea.getAssignee() == null ? "":tarea.getAssignee(), "Anulada");
+		}
+		
+//		List<Execution> listaExecutions = runtimeService.createExecutionQuery().processInstanceId(idProceso).list();
+//		
+//		if (!listaExecutions.isEmpty()) {
+//			listaExecutions.forEach(exec ->{
+//				exec.getId();
+//				processEngine.getRepositoryService().
+//			});
+//		}
+		
+		
+		List<Job> listaJobs = processEngine.getManagementService().createJobQuery().processInstanceId(idProceso).list();
+		
+		if (!listaJobs.isEmpty()) {
+			listaJobs.forEach( job -> {
+				System.out.println("Categoria:"+job.getCategory());
+				System.out.println("Categoria:"+job.getElementId());
+				System.out.println("Categoria:"+job.getCustomValues());
+				System.out.println("Categoria:"+job.getElementName());
+				System.out.println("Categoria:"+job.getJobType());
+				System.out.println("Categoria:"+job.getScopeId());
+				System.out.println("Categoria:"+job.getExecutionId());
+				
+				
+			//	processEngine.getManagementService().deleteJob(job.getId());
+			});
 		}
 		
 //		List<ActivityInstance> tareasActivas2 = runtimeService.createActivityInstanceQuery().processInstanceId(idProceso).unfinished().activityType("userTask").list();

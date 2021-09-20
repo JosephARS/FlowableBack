@@ -1,42 +1,43 @@
 package com.bolivar.accesoclientes.flujos.indemnizaciones.calculadoraLiquidacion.handler;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
+import org.flowable.job.api.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import com.bolivar.accesoclientes.flujos.indemnizaciones.calculadoraLiquidacion.model.ProcesoCalc;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.calculadoraLiquidacion.model.RequestCalculadoraDTO;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.calculadoraLiquidacion.model.ResponseCalculadoraDTO;
-import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.model.NuevoCaso;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.EstadoSolicitud;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.InfoGeneralProceso;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.repository.InfoGeneralProcesoRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
 public class HandlerCalculadoraLiquidacion implements JavaDelegate {
+	
+	@Autowired
+	ManagementService managementService;
 	
 	@Autowired
 	private Environment env;
@@ -46,54 +47,30 @@ public class HandlerCalculadoraLiquidacion implements JavaDelegate {
 
 	
 	@Override
-	public void execute(DelegateExecution execution) {
+	@Retryable(value = BpmnError.class, maxAttempts = 2, backoff = @Backoff(1000))
+	public void execute(DelegateExecution execution){ 
 		
-//		System.out.println("exe:"+ execution.getRootProcessInstanceId());
-//		System.out.println("exe:"+ execution.getProcessInstanceId());
-//		Optional<InfoGeneralProceso> obtenerProceso = Optional.ofNullable(infoProcesoRepository.findByIdProceso(execution.getProcessInstanceId().toString()).get());
-//		System.out.println(obtenerProceso.get().getDocumento().getInfoProducto().getNumeroPoliza());
-//		
-//		List<String> conteoProcesosActivos = new ArrayList<String>();
-//		conteoProcesosActivos.add("8d493f67-ea46-11eb-9cbd-b07d648ec81d");
-		
-		String letraString = "a";
-		System.out.println(letraString);
-		
-		
-		//List<InfoGeneralProceso> validarProcesoRepetido = infoProcesoRepository.findByIdProcesoIn(conteoProcesosActivos);
-//		System.out.println(conteoProcesosActivos);
-		
-		
+		RestTemplate restTemplate = new RestTemplate();
+		String CALCULADORA_LIQUIDACION = "spring.profiles.calculadoraLiquidacion";
+		String idProceso = execution.getRootProcessInstanceId();
 		
 		try {
-
-			RestTemplate restTemplate = new RestTemplate();
-			String idProceso = execution.getRootProcessInstanceId();
-			
-//			String idProceso = execution.getRootProcessInstanceId();
-			
-//			System.out.println("Poliza" + obtenerProceso.getDocumento().getInfoProducto().getNumeroPoliza());
 			
 			Optional<InfoGeneralProceso> obtenerProceso = infoProcesoRepository.findByIdProceso(idProceso);
-			
-			//System.out.println("Poliza" + obtenerProceso.getDocumento().getInfoProducto().getNumeroPoliza());
-			
-			String CALCULADORA_LIQUIDACION = "spring.profiles.calculadoraLiquidacion";
 
-			//NuevoCaso variables = (NuevoCaso) execution.getVariables();
 			SimpleDateFormat fecha = new SimpleDateFormat("mm-dd-yyyy"); 
 			long codCia = 3;
 			long codSecc = 23;
 			long codRamo = 117;
-			Long numPol1 = (Long) obtenerProceso.get().getDocumento().getInfoProducto().getNumeroPoliza();
+			Long numPol1 = null;
+			if (obtenerProceso.isPresent()) {
+				numPol1 =  obtenerProceso.get().getDocumento().getInfoProducto().getNumeroPoliza();
+			}
 			long codRies = 1;
 			Date fechaSini = null;
-			try {
-				fechaSini = fecha.parse("06-01-2019");
-			} catch (ParseException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+
+			fechaSini = fecha.parse("06-01-2019");
+
 			long codCausa = 129;
 			long codCons = 74;
 			long codCob = 351;
@@ -104,9 +81,8 @@ public class HandlerCalculadoraLiquidacion implements JavaDelegate {
 			proceso.setProceso(70);
 			proceso.setSubProceso(null);
 			proceso.setProceso(3);
-			System.out.println(fechaSini);
-
-			//String urlString = "https://fz73xehwah.execute-api.us-east-1.amazonaws.com/dev/poliza/api/v1/siniestros/calculadora";
+			System.out.println(execution.getId());
+			System.out.println(execution.getProcessInstanceId());
 
 			String urlString = env.getProperty(CALCULADORA_LIQUIDACION);
 			System.out.println("URL:" + urlString);
@@ -133,36 +109,56 @@ public class HandlerCalculadoraLiquidacion implements JavaDelegate {
 			requestCalculadora.setProceso(proceso);
 			
 			ObjectMapper mapper = new ObjectMapper();
-			try {
-				log.info("Calculadora: "+ mapper.writeValueAsString(requestCalculadora));
-			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			HttpEntity<RequestCalculadoraDTO> httpEntity = new HttpEntity<>(requestCalculadora, headers);
-			ResponseCalculadoraDTO result = restTemplate.postForObject(urlString, httpEntity, ResponseCalculadoraDTO.class);
-			
-			if (result.getCodRespuesta() < 1) {
-				log.info(result.getCodRespuesta().toString());
-			}
+
+			log.info("Calculadora: "+ mapper.writeValueAsString(requestCalculadora));
+
 			
 
-			log.info("Consulta de calculadora liquidacion: " + result);
-			
-			if (result.getValIndemnizar() != null) {
-				System.out.println(result.getValIndemnizar());
-				int res = infoProcesoRepository.updateValorByIdProceso(idProceso, result.getValIndemnizar());
+				HttpEntity<RequestCalculadoraDTO> httpEntity = new HttpEntity<>(requestCalculadora, headers);
+				ResponseEntity<Object> result = restTemplate.exchange(urlString, HttpMethod.POST, httpEntity, Object.class);
+					
+				ResponseCalculadoraDTO oResponseCalc = (ResponseCalculadoraDTO) result.getBody();
+				
+				log.info("Codigo respuesta: " + result.getBody());
+				log.info("Consulta de calculadora liquidacion: " + oResponseCalc);
+				
+				int res = infoProcesoRepository.updateValorByIdProceso(idProceso, oResponseCalc.getValIndemnizar());
 				int respuesta2 = infoProcesoRepository.P_ACTUALIZAR_ESTADO(idProceso, EstadoSolicitud.PAGO);
-				System.out.println(res); 
-			}
+				System.out.println(res);
 
 			
-		} catch (Exception e) {
-			log.error("Error en calculadora liquidacion " + " | " + e.getMessage() + " | " + e.getClass() + " | "
-					+ e.getLocalizedMessage() );
+			} catch (HttpStatusCodeException e) {
 
-		} 
+				boolean a = true; //001			
+				
+				log.error("ErrorWS :: respuesta servicio Calculadora liquidacion: " + e.getStatusCode() + " | " + e.getResponseBodyAsString());
+							
+				if (e.getStatusCode().is4xxClientError() && a) {
+
+					List<Job> job = managementService.createJobQuery().executionId(execution.getId()).list();
+
+					job.forEach(x -> {
+				    	log.info("Job reintentos: {}", x.getRetries());
+				    	log.info("Job actividad: {}", x.getElementName());
+				    	log.info("Job mensaje excepcion: {}", x.getExceptionMessage());
+					});
+					infoProcesoRepository.P_ACTUALIZAR_ESTADO(idProceso, EstadoSolicitud.ERROR_SW);
+					throw new FlowableException(e.getMessage());	//Error lanzado para que el proceso quede suspendido en "Dead letter".
+				}
+				else {
+					throw new BpmnError("002",e.getMessage()); //Error lanzado para que flowable reintente mas tarde
+				}
+
+
+			}  catch (Exception e) {
+				log.error("Error en calculadora liquidacion " + " | " + e.getMessage() + " | " + e.getClass() + " | " + e.getLocalizedMessage() );
+				infoProcesoRepository.P_ACTUALIZAR_ESTADO(idProceso, EstadoSolicitud.ERROR_SW);
+				throw new FlowableException(e.getMessage());
+			} 
+
+			
+		
 	}
+
 
 }

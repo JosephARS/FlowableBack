@@ -1,6 +1,7 @@
 package com.bolivar.accesoclientes.flujos.indemnizaciones.util.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -38,6 +39,9 @@ public class InfoGeneralProceso implements Serializable{
     @Type(type = "json")
     @Column(columnDefinition = "json")
     VariablesProceso  documento;					//Objeto del tipo ProcesoIndemnizacion
+    @Type(type = "json")
+    @Column(columnDefinition = "json")
+    List<Analisis> historialAnalisis;
 	
 	public InfoGeneralProceso() {
 		//super();

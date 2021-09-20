@@ -1,4 +1,4 @@
-package com.segurosbolivar;
+package com.bolivar.accesoclientes.flujos.indemnizaciones;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

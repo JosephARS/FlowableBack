@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.4.5'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+	id "org.sonarqube" version "3.3"
 }
 
 group = 'com.segurosbolivar'
@@ -10,6 +11,7 @@ sourceCompatibility = '11'
 
 repositories {
 	mavenCentral()
+	maven { url "https://jaspersoft.jfrog.io/artifactory/third-party-ce-artifacts/" }
 }
 
 dependencies {
@@ -17,8 +19,11 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.retry:spring-retry:1.3.1'	
 	implementation 'javax.persistence:javax.persistence-api:2.2'
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.4'
+	implementation ('net.sf.jasperreports:jasperreports:6.17.0')
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	compileOnly "org.flowable:flowable-spring-boot-starter:6.6.0"
 	runtimeOnly 'mysql:mysql-connector-java:8.0.22'
@@ -29,6 +34,11 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
 	
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+
+
 	
 }
 

@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
@@ -27,11 +28,14 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ActivityInstance;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.engine.runtime.ExecutionQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Comment;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.identitylink.api.IdentityLinkInfo;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +51,7 @@ import com.bolivar.accesoclientes.flujos.indemnizaciones.moduloGestion.DAO.Modul
 import com.bolivar.accesoclientes.flujos.indemnizaciones.moduloGestion.model.Actividad;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.moduloGestion.model.TareasCantidad;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.Ajustador;
+import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.Analisis;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.CanalAtencion;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.InfoGeneralProceso;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.InfoProceso;
@@ -58,7 +63,9 @@ import com.bolivar.accesoclientes.flujos.indemnizaciones.util.repository.InfoGen
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.repository.UsuariosRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
+import liquibase.pro.packaged.a;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -75,6 +82,7 @@ public class ModuloGestionService implements ModuloGestionDAO {
 	ProcessEngine processEngine;
 	RepositoryService repositoryService;
 	InfoGeneralProcesoRepository infoProcesoRepository;
+	ManagementService managementService;
 	UsuariosRepository usuariosRepository;
 	ActualizarValorReservaService actualizarValorReservaService;
 
@@ -144,10 +152,8 @@ public class ModuloGestionService implements ModuloGestionDAO {
 
 		} catch (Exception e) {
 			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
-			oResponseWS.setMensaje("Error obteniendo tareas " + " | " + e.getMessage() + " | " + e.getClass() + " | "
-					+ e.getLocalizedMessage());
-			log.error("Error obteniendo tareas " + " | " + e.getMessage() + " | " + e.getClass() + " | "
-					+ e.getLocalizedMessage());
+			oResponseWS.setMensaje("Error obteniendo tareas " );
+			log.error("Error obteniendo tareas " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
 
 		}
 
@@ -205,10 +211,8 @@ public class ModuloGestionService implements ModuloGestionDAO {
 
 		} catch (Exception e) {
 			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
-			oResponseWS.setMensaje("Error obteniendo cantidad tareas " + " | " + e.getMessage() + " | " + e.getClass()
-					+ " | " + e.getLocalizedMessage());
-			log.error("Error obteniendo cantidad tareas " + " | " + e.getMessage() + " | " + e.getClass() + " | "
-					+ e.getLocalizedMessage());
+			oResponseWS.setMensaje("Error obteniendo cantidad tareas ");
+			log.error("Error obteniendo cantidad tareas " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
 		}
 
 		return oResponseWS;
@@ -272,10 +276,8 @@ public class ModuloGestionService implements ModuloGestionDAO {
 
 		} catch (Exception e) {
 			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
-			oResponseWS.setMensaje("Error obteniendo tareas " + " | " + e.getMessage() + " | " + e.getClass() + " | "
-					+ e.getLocalizedMessage());
-			log.error("Error obteniendo tareas " + " | " + e.getMessage() + " | " + e.getClass() + " | "
-					+ e.getLocalizedMessage());
+			oResponseWS.setMensaje("Error obteniendo tareas " );
+			log.error("Error obteniendo tareas " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
 
 		}
 
@@ -329,10 +331,8 @@ public class ModuloGestionService implements ModuloGestionDAO {
 
 		} catch (Exception e) {
 			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
-			oResponseWS.setMensaje("Error historico de proceso " + " | " + e.getMessage() + " | " + e.getClass() + " | "
-					+ e.getLocalizedMessage());
-			log.error("Error historico de proceso " + " | " + e.getMessage() + " | " + e.getClass() + " | "
-					+ e.getLocalizedMessage());
+			oResponseWS.setMensaje("Error historico de proceso " );
+			log.error("Error historico de proceso " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
 
 		}
 
@@ -362,11 +362,16 @@ public class ModuloGestionService implements ModuloGestionDAO {
 
 			Map<String, Object> map = new LinkedHashMap<>();
 			Map<String, Object> metadataMap = new LinkedHashMap<>();
+			ObjCodigoValor canalCreacion = null;
+			String estadoCaso = "";
+			if (procesoIndemnizacion.isPresent()) {
+				canalCreacion =  procesoIndemnizacion.get().getDocumento().getInfoProceso()
+						.getCanalCreacion();
+				estadoCaso = procesoIndemnizacion.get().getDocumento().getInfoProceso().getEstadoSolicitud();
+			}
+			
 
-			ObjCodigoValor canalCreacion = (ObjCodigoValor) procesoIndemnizacion.get().getDocumento().getInfoProceso()
-					.getCanalCreacion(); // datosProceso.getProcessVariables().get("canalCreacion");
-
-			String estadoCaso = procesoIndemnizacion.get().getDocumento().getInfoProceso().getEstadoSolicitud();
+			
 
 			metadataMap.put("idConsecutivo",
 					procesoIndemnizacion.get().getDocumento().getInfoProceso().getIdConsecutivo());
@@ -375,7 +380,7 @@ public class ModuloGestionService implements ModuloGestionDAO {
 			metadataMap.put("canalCreacion", canalCreacion);
 			metadataMap.put("estadoCaso", estadoCaso);
 
-			VariablesProceso oVariablesProceso = procesoIndemnizacion.get().getDocumento();
+			//VariablesProceso oVariablesProceso = procesoIndemnizacion.get().getDocumento();
 
 			map.put("xml", xml);
 			map.put("idProceso", datosProceso.getId());
@@ -389,30 +394,32 @@ public class ModuloGestionService implements ModuloGestionDAO {
 			map.put("anulacion", procesoIndemnizacion.get().getDocumento().getAnulacion());
 			map.put("objecion", procesoIndemnizacion.get().getDocumento().getObjecion());
 			map.put("ajustador", procesoIndemnizacion.get().getDocumento().getAjustador());
+			map.put("historialAnalisis", procesoIndemnizacion.get().getHistorialAnalisis());
 
 			oResponseWS.setResultado(map);
 			oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
 
 		} catch (Exception e) {
 			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
-			oResponseWS.setMensaje("Error obteniendo datos del proceso " + " | " + e.getMessage() + " | " + e.getClass()
-					+ " | " + e.getLocalizedMessage());
-			log.error("Error obteniendo datos del proceso " + " | " + e.getMessage() + " | " + e.getClass() + " | "
-					+ e.getLocalizedMessage());
+			oResponseWS.setMensaje("Error obteniendo datos del proceso " );
+			log.error("Error obteniendo datos del proceso " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
 		}
 
 		return oResponseWS;
 	}
 
 	@Override
-	public ResponseWS obtenerListaProcesosHistorico(Boolean procesosFinalizados, Integer itemPorPagina,
-			Integer primerItem) { // Mostrar todos los proceso ya finalizados o con tareas asignadas a usuarios
+	public ResponseWS obtenerListaProcesosHistorico(Boolean procesosFinalizados, Integer itemPorPagina, Integer primerItem, Date fechaInicio, Date fechaFin) { // Mostrar todos los proceso ya finalizados o con tareas asignadas a usuarios
 
 		ResponseWS oResponseWS = new ResponseWS();
 
 		List<Object> oProcesoList = new ArrayList<Object>();
 
 		long totalProcesos = 0;
+		
+		Date fechaActual = new Date();
+		
+		System.out.println(fechaInicio + "/"+ fechaFin);
 
 		try {
 
@@ -424,16 +431,19 @@ public class ModuloGestionService implements ModuloGestionDAO {
 																										// los procesos
 																										// NO
 																										// finalizados
-						// .variableValueEquals("numeroDocumento", identificacion)
-
-						.includeProcessVariables().unfinished().orderByHistoricTaskInstanceStartTime().desc()
+						.includeProcessVariables()
+						.unfinished()
+						.taskCreatedBefore(fechaFin)
+						.taskCreatedAfter(fechaInicio)
+						.orderByHistoricTaskInstanceStartTime().desc()
 						.listPage(primerItem, itemPorPagina);
-				// .list();
+
 
 				totalProcesos = historyService.createHistoricTaskInstanceQuery() // Se valida los procesos creados para
 																					// dicho numero de identificacion de
 																					// asegurado.
-						// .variableValueEquals("numeroDocumento", identificacion)
+						.taskCreatedBefore(fechaFin)
+						.taskCreatedAfter(fechaInicio)
 						.unfinished().count();
 
 				for (HistoricTaskInstance proceso : procesos) {
@@ -441,12 +451,10 @@ public class ModuloGestionService implements ModuloGestionDAO {
 					Map<String, Object> map = new LinkedHashMap<>();
 					map.put("idConsecutivo", proceso.getProcessVariables().get("idConsecutivo"));
 					map.put("idProceso", proceso.getProcessInstanceId());
-					// map.put("idTarea", proceso.getId());
-					// map.put("idTareaDefinicion", proceso.getTaskDefinitionId());
 					map.put("nombreTarea", proceso.getName());
 					map.put("fechaCreacion", proceso.getCreateTime());
-					map.put("fechaSolucion", proceso.getEndTime());
-
+					map.put("fechaSolucion", proceso.getDueDate());
+					map.put("estadoSolucion", calcularTiempoSolucion(fechaActual, proceso.getDueDate()));
 					oProcesoList.add(map);
 
 				}
@@ -455,48 +463,53 @@ public class ModuloGestionService implements ModuloGestionDAO {
 
 				HistoryService historyService = processEngine.getHistoryService();
 
-				List<HistoricProcessInstance> procesos = historyService.createHistoricProcessInstanceQuery() // Se
-																												// obtienen
-																												// los
-																												// procesos
-																												// ya
-																												// finalizados
-						// .variableValueEquals("numeroDocumento", identificacion)
-						.includeProcessVariables().finished().notDeleted().listPage(primerItem, itemPorPagina);
-				// .list();
+				List<HistoricProcessInstance> procesos = historyService.createHistoricProcessInstanceQuery() // Se obtienen los procesos ya finalizados
+						.includeProcessVariables()
+						.finished()
+						.notDeleted()
+						.finishedBefore(fechaFin)
+						.finishedAfter(fechaInicio)
+						.orderByProcessInstanceEndTime()
+						.desc()
+						.listPage(primerItem, itemPorPagina);
 
-				totalProcesos = historyService.createHistoricProcessInstanceQuery() // Se valida los procesos creados
-																					// para dicho numero de
-																					// identificacion de asegurado.
-						// .variableValueEquals("numeroDocumento", identificacion)
-						.finished().notDeleted().count();
+				totalProcesos = historyService.createHistoricProcessInstanceQuery() // Se valida los procesos creados para dicho numero de identificacion de asegurado.
+						.finished()
+						.notDeleted()
+						.finishedBefore(fechaFin)
+						.finishedAfter(fechaInicio)
+						.count();
 
+				
 				for (HistoricProcessInstance proceso : procesos) {
 
 					Map<String, Object> map = new LinkedHashMap<>();
 					map.put("idConsecutivo", proceso.getProcessVariables().get("idConsecutivo"));
 					map.put("idProceso", proceso.getId());
 					map.put("idTarea", null);
-					map.put("nombreTarea", proceso.getEndActivityId());
+					map.put("nombreActividad", proceso.getEndActivityId());
 					map.put("fechaCreacion", proceso.getStartTime());
 					map.put("fechaSolucion", proceso.getEndTime());
-
+					map.put("tiempoSolucion", proceso.getDurationInMillis());
 					oProcesoList.add(map);
 
 				}
 			}
-
-			oResponseWS.setTotalItems(totalProcesos);
-			oResponseWS.setListaResultado(oProcesoList);
-			oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
-			oResponseWS.setMensaje("Consulta realizada con éxito");
+			
+			if (totalProcesos>0) {
+				oResponseWS.setTotalItems(totalProcesos);
+				oResponseWS.setListaResultado(oProcesoList);
+				oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
+				oResponseWS.setMensaje("Consulta realizada con exito");
+			}else {
+				oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
+				oResponseWS.setMensaje("No se encontraron resultados para la consulta.");
+			}
 
 		} catch (Exception e) {
 			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
-			oResponseWS.setMensaje("Error obteniendo historico procesos " + " | " + e.getMessage() + " | "
-					+ e.getClass() + " | " + e.getLocalizedMessage());
-			log.error("Error obteniendo historico procesos " + " | " + e.getMessage() + " | " + e.getClass() + " | "
-					+ e.getLocalizedMessage());
+			oResponseWS.setMensaje("Error obteniendo historico procesos " );
+			log.error("Error obteniendo historico procesos " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
 
 		}
 
@@ -504,65 +517,78 @@ public class ModuloGestionService implements ModuloGestionDAO {
 	}
 
 	@Override
-	public ResponseWS obtenerListaProcesosAnulados(Integer itemPorPagina, Integer primerItem) {
+	public ResponseWS obtenerListaProcesosAnulados(Integer itemPorPagina, Integer primerItem, Date fechaInicio, Date fechaFin) {
 
 		ResponseWS oResponseWS = new ResponseWS();
 
 		List<Object> oProcesoList = new ArrayList<Object>();
 
 		HistoryService historyService = processEngine.getHistoryService();
-
-		try {
-
+		
+		try {		
+					
 			List<HistoricProcessInstance> procesos = historyService.createHistoricProcessInstanceQuery() // Se obtienen los procesos ya	finalizados
 					// .variableValueEquals("numeroDocumento", identificacion)
 					.includeProcessVariables()
+					.finished()
 					.deleted()
+					.finishedBefore(fechaFin)
+					.finishedAfter(fechaInicio)
 					.orderByProcessInstanceEndTime()
 					.desc()
 					.listPage(primerItem, itemPorPagina);
-			// .list();
-
+			
 			long totalProcesos = historyService.createHistoricProcessInstanceQuery() // Se valida los procesos creados
 																						// para dicho numero de
 																						// identificacion de asegurado.
 					// .variableValueEquals("numeroDocumento", identificacion)
-					.deleted().count();
+					.finished()
+					.deleted()
+					.finishedBefore(fechaFin)
+					.finishedAfter(fechaInicio)
+					.count();
 
 			
 			List<String> listaIdProcesos = new ArrayList<String>();
 			
-			procesos.forEach(proceso -> {
-				listaIdProcesos.add(proceso.getId());
-	        });
-			
-			List<InfoGeneralProceso> listaResultado = infoProcesoRepository.findByIdProcesoIn(listaIdProcesos);
-			
-			for (HistoricProcessInstance proceso : procesos) {
+			if (totalProcesos>0) {
+
+				procesos.forEach(proceso -> {
+					listaIdProcesos.add(proceso.getId());
+		        });
 				
-				InfoGeneralProceso anulacion = listaResultado.stream().filter(p -> p.getIdProceso().equals(proceso.getId())).collect(Collectors.toList()).get(0);
+				List<InfoGeneralProceso> listaResultado = infoProcesoRepository.findByIdProcesoIn(listaIdProcesos);
 
-				Map<String, Object> map = new LinkedHashMap<>();
-				map.put("idConsecutivo", proceso.getProcessVariables().get("idConsecutivo"));
-				map.put("anulacion", anulacion.getDocumento().getAnulacion());
-				map.put("motivoAnulacion", proceso.getDeleteReason());
-				map.put("fechaCreacion", proceso.getStartTime());
-				map.put("fechaAnulacion", proceso.getEndTime());
+				for (HistoricProcessInstance proceso : procesos) {
+					
+					Optional<InfoGeneralProceso> anulacion = listaResultado.stream().filter(p -> p.getIdProceso().equals(proceso.getId())).findAny();
+					
+					Map<String, Object> map = new LinkedHashMap<>();
+					map.put("idConsecutivo", proceso.getProcessVariables().get("idConsecutivo"));
+					map.put("motivoAnulacion", proceso.getDeleteReason());
+					map.put("fechaCreacion", proceso.getStartTime());
+					map.put("fechaAnulacion", proceso.getEndTime());
+					if (anulacion.isPresent()) {
+						map.put("anulacion", anulacion.get().getDocumento().getAnulacion());
+					}
 
-				oProcesoList.add(map);
-
+	
+					oProcesoList.add(map);
+	
+				}
+				oResponseWS.setTotalItems(totalProcesos);
+				oResponseWS.setListaResultado(oProcesoList);
+				oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
+				oResponseWS.setMensaje("Consulta realizada con exito");
+			}else {
+				oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
+				oResponseWS.setMensaje("No se encontraron resultados para la consulta.");
 			}
-			oResponseWS.setTotalItems(totalProcesos);
-			oResponseWS.setListaResultado(oProcesoList);
-			oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
-			oResponseWS.setMensaje("Consulta realizada con éxito");
 
 		} catch (Exception e) {
 			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
-			oResponseWS.setMensaje("Error obteniendo procesos anulados " + " | " + e.getMessage() + " | " + e.getClass()
-					+ " | " + e.getLocalizedMessage());
-			log.error("Error obteniendo procesos anulados " + " | " + e.getMessage() + " | " + e.getClass() + " | "
-					+ e.getLocalizedMessage());
+			oResponseWS.setMensaje("Error obteniendo procesos anulados " );
+			log.error("Error obteniendo procesos anulados " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
 
 		}
 
@@ -571,62 +597,76 @@ public class ModuloGestionService implements ModuloGestionDAO {
 	}
 
 	@Override
-	public ResponseWS obtenerListaProcesosPendientes(Integer itemPorPagina, Integer primerItem) {
+	public ResponseWS obtenerListaProcesosPendientes(Integer itemPorPagina, Integer primerItem, Date fechaInicio, Date fechaFin) {
 
 		ResponseWS oResponseWS = new ResponseWS();
 
 		List<Object> oProcesoList = new ArrayList<Object>();
 
 		HistoryService historyService = processEngine.getHistoryService();
+		
+		List<EventSubscription> procesos = null;
+		
+		long totalProcesos = 0;
 
 		try {
+			if (fechaFin == null) {
+				procesos = runtimeService.createEventSubscriptionQuery() // Se obtienen los procesos ya finalizados
+						.orderByCreateDate().desc().listPage(primerItem, itemPorPagina);
 
-			List<EventSubscription> procesos = runtimeService.createEventSubscriptionQuery() // Se obtienen los procesos
-																								// ya finalizados
-					// .variableValueEquals("numeroDocumento", identificacion)
-					// .includeProcessVariables()
-					.orderByCreateDate().desc().listPage(primerItem, itemPorPagina);
-			// .list();
 
-			long totalProcesos = runtimeService.createEventSubscriptionQuery() // Se valida los procesos creados para
-																				// dicho numero de identificacion de
-																				// asegurado.
-					// .variableValueEquals("numeroDocumento", identificacion)
-					// .finished()
-					.count();
-
-			for (EventSubscription proceso : procesos) {
-
-				ProcessInstance resultado = runtimeService.createProcessInstanceQuery()
-						.processInstanceId(proceso.getProcessInstanceId()).includeProcessVariables().singleResult();
-
-				Map<String, Object> map = new LinkedHashMap<>();
-				map.put("idConsecutivo", resultado.getProcessVariables().get("idConsecutivo"));
-				map.put("idProceso", proceso.getProcessInstanceId());
-				map.put("idTareaDefinicion", proceso.getActivityId());
-				map.put("nombreTarea", proceso.getEventName());
-				map.put("fechaCreacion", proceso.getCreated());
-				map.put("fechaSolucion", null);
-
-				oProcesoList.add(map);
-
+				totalProcesos = runtimeService.createEventSubscriptionQuery() // Se valida los procesos creados para dicho numero de identificacion de asegurado.
+						.count();
+			}else {
+				procesos = runtimeService.createEventSubscriptionQuery() // Se obtienen los procesos ya finalizados
+						.createdBefore(fechaFin)
+						.createdAfter(fechaInicio)
+						.orderByCreateDate().desc().listPage(primerItem, itemPorPagina);
+	
+	
+				totalProcesos = runtimeService.createEventSubscriptionQuery() // Se valida los procesos creados para dicho numero de identificacion de asegurado.
+						.createdBefore(fechaFin)
+						.createdAfter(fechaInicio)
+						.count();
 			}
-			oResponseWS.setTotalItems(totalProcesos);
-			oResponseWS.setListaResultado(oProcesoList);
-			oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
-			oResponseWS.setMensaje("Consulta realizada con éxito");
+			
+			if (totalProcesos>0) {
+				for (EventSubscription proceso : procesos) {
+
+					ProcessInstance resultado = runtimeService.createProcessInstanceQuery()
+							.processInstanceId(proceso.getProcessInstanceId()).includeProcessVariables().singleResult();
+
+					Map<String, Object> map = new LinkedHashMap<>();
+					map.put("idConsecutivo", resultado.getProcessVariables().get("idConsecutivo"));
+					map.put("idProceso", proceso.getProcessInstanceId());
+					map.put("idTareaDefinicion", proceso.getActivityId());
+					map.put("nombreTarea", proceso.getEventName());
+					map.put("fechaCreacion", proceso.getCreated());
+					map.put("fechaSolucion", null);
+
+					oProcesoList.add(map);
+
+				}
+				oResponseWS.setTotalItems(totalProcesos);
+				oResponseWS.setListaResultado(oProcesoList);
+				oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
+				oResponseWS.setMensaje("Consulta realizada con exito");
+			}else {
+				oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
+				oResponseWS.setMensaje("No se encontraron resultados para la consulta.");
+			}
+			
 
 		} catch (Exception e) {
 			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
-			oResponseWS.setMensaje("Error obteniendo procesos anulados " + " | " + e.getMessage() + " | " + e.getClass()
-					+ " | " + e.getLocalizedMessage());
-			log.error("Error obteniendo procesos anulados " + " | " + e.getMessage() + " | " + e.getClass() + " | "
-					+ e.getLocalizedMessage());
+			oResponseWS.setMensaje("Error obteniendo procesos pendientes ");
+			log.error("Error obteniendo procesos pendientes " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
 
 		}
 
 		return oResponseWS;
 	}
+	
 
 	public ResponseWS completarTarea(String idTarea, String idTareaDefinicion, String idUsuario,
 			VariablesProceso variablesProceso) { // Completar la tarea creada para el usuario/analista
@@ -682,15 +722,14 @@ public class ModuloGestionService implements ModuloGestionDAO {
 			case "userTask_ActualizacionValorReserva":
 				System.out.println(idTareaDefinicion);
 				log.info("objecto: " + variablesProceso);
-				String tipoEvento = variablesProceso.getSiniestro().getTipoEvento();
-				Boolean reservaActualizada = actualizarValorReservaService.consultaServicioSimon(variablesProceso,
-						tipoEvento);
+
+				Boolean reservaActualizada = actualizarValorReservaService.consultaServicioSimon(variablesProceso);
 				log.info(reservaActualizada.toString());
 
 				if (reservaActualizada) {
 					Long valorReserva = variablesProceso.getSiniestro().getValorReserva();
 
-					log.info(tipoEvento, valorReserva, idTareaDefinicion);
+					log.info(valorReserva + idTareaDefinicion);
 					variables.put("valorReserva", valorReserva);
 					//taskService.addUserIdentityLink(idTarea, idUsuario, "assignee");
 					taskService.complete(idTarea, variables);
@@ -797,7 +836,7 @@ public class ModuloGestionService implements ModuloGestionDAO {
 		} catch (Exception e) {
 			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
 			oResponseWS.setMensaje("Error completando la tarea " + idTareaDefinicion);
-			log.error("Error completando la tarea " + idTareaDefinicion + e.getMessage() + " | " + e.getClass() + " | "	+ e.getCause());
+			log.error("Error completando la tarea " + idTareaDefinicion + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
 		}
 
 		return oResponseWS;
@@ -886,10 +925,8 @@ public class ModuloGestionService implements ModuloGestionDAO {
 			oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
 
 		} catch (Exception e) {
-			String mensajeError = "Error obteniendo historial del caso " + idProceso + e.getMessage() + " | "
-					+ e.getClass() + " | " + e.getCause();
+			String mensajeError = "Error obteniendo historial del caso " + idProceso + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0];
 			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
-			oResponseWS.setMensaje(mensajeError);
 			log.error(mensajeError);
 		}
 
@@ -941,14 +978,12 @@ public class ModuloGestionService implements ModuloGestionDAO {
 			case "numeroSiniestro":
 				
 				List<InfoGeneralProceso> resultadoProcesos = null;
-				System.out.println("entra");
 				try {
-					System.out.println("entra2");
 					resultadoProcesos = infoProcesoRepository.P_BUSCAR_PROCESO(parametroBusqueda,
 							valorBusqueda, itemPorPagina, primerItem);
-					System.out.println(resultadoProcesos);
+
 				} catch (Exception e) {
-					log.error("NO DATOS" + e.getMessage() + "|" + e.getCause() + e.getLocalizedMessage());
+					log.error("NO DATOS" + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
 					break;
 				} 
 
@@ -957,7 +992,6 @@ public class ModuloGestionService implements ModuloGestionDAO {
 					resultadoProcesos.forEach(proceso -> {
 						listaProcesos.add(proceso.getIdProceso());
 					});
-					System.out.println(listaProcesos);
 				
 					procesos = historyService.createHistoricProcessInstanceQuery()
 							.processInstanceIds(listaProcesos)
@@ -977,7 +1011,7 @@ public class ModuloGestionService implements ModuloGestionDAO {
 			}
 
 			if (totalItems > 0) {
-System.out.println("Control");
+
 				for (HistoricProcessInstance proceso : procesos) {
 
 					if (proceso.getEndTime() != null) { // Proceso finalizado
@@ -1009,7 +1043,7 @@ System.out.println("Control");
 					map.put("nombreTarea", nombreTarea);
 					map.put("fechaCreacion", proceso.getStartTime());
 					map.put("fechaSolucion", proceso.getEndTime());
-					map.put("estado", proceso.getEndTime());
+					map.put("tiempoSolucion", proceso.getDurationInMillis());
 
 					oProcesoList.add(map);
 					nombreTarea = "";
@@ -1028,8 +1062,7 @@ System.out.println("Control");
 			}
 
 		} catch (Exception e) {
-			String mensajeError = "Error realizando busqueda "  + parametroBusqueda + " " + valorBusqueda + e.getMessage() + " | "
-					+ e.getClass() + " | " + e.getCause();
+			String mensajeError = "Error realizando busqueda "  + parametroBusqueda + " " + valorBusqueda + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0];
 			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
 			oResponseWS.setMensaje(mensajeError);
 			log.error(mensajeError);
@@ -1054,7 +1087,7 @@ System.out.println("Control");
 			log.info("Lista de usuarios asignables " + idTareaDefinicion);
 			
 		} catch (Exception e) {
-			String mensajeError = "Error listando usuarios "  + idTareaDefinicion + e.getMessage() + " | " + e.getClass() + " | " + e.getCause();
+			String mensajeError = "Error listando usuarios "  + idTareaDefinicion + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0];
 			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
 			oResponseWS.setMensaje("Error listando usuarios " + idTareaDefinicion);
 			log.error(mensajeError);
@@ -1080,7 +1113,7 @@ System.out.println("Control");
 	    	log.info("Tarea reasignada" + usuarioAsignado);
 			
 		} catch (Exception e) {
-			String mensajeError = "Error reasignando usuario "  + usuarioAsignado + " " + idProceso + e.getMessage() + " | " + e.getClass() + " | " + e.getCause();
+			String mensajeError = "Error reasignando usuario "  + usuarioAsignado + " " + idProceso + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0];
 			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
 			oResponseWS.setMensaje("Error reasignando usuario " + usuarioAsignado);
 			log.error(mensajeError);
@@ -1111,7 +1144,7 @@ System.out.println("Control");
 
 			
 		} catch (Exception e) {
-			String mensajeError = "Error cambiando estado de usuario "  + idUsuario + " " + estado + e.getMessage() + " | " + e.getClass() + " | " + e.getCause();
+			String mensajeError = "Error cambiando estado de usuario "  + idUsuario + " " + estado + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0];
 			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
 			oResponseWS.setMensaje("Error cambiando estado de usuario ");
 			log.error(mensajeError);
@@ -1119,6 +1152,38 @@ System.out.println("Control");
 		return oResponseWS;	
 		
 	}
+	
+	
+	public ResponseWS ingresarNuevoAnalisis(String idProceso, Analisis analisis) {
+		
+		ResponseWS oResponseWS = new ResponseWS();
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+		
+		try {			
+			int respuesta = infoProcesoRepository.P_INGRESAR_ANALISIS(idProceso, mapper.writeValueAsString(analisis));
+			if (respuesta == 0) {
+				oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
+				oResponseWS.setMensaje("Analisis creado con exito");
+		    	log.info("Analisis creado con exito");
+			} else {
+				oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
+				oResponseWS.setMensaje("Error ingresando analisis en historial");
+			}
+		} catch (Exception e) {
+			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
+			log.error("Error ingresando analisis en historial: "+ idProceso + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
+		}	
+		
+		return oResponseWS;		
+		
+	}
+	
+	
+	
+	
+	
+	
 	
 	public ResponseWS corregirActividadAnterior(VariablesProceso variablesProceso) {
 		
@@ -1144,6 +1209,7 @@ System.out.println("Control");
 	    
 	    String tiempo = "";
 	    String estadoSolucion = "";
+	    int tiempoAlerta = 2; //Tiempo para establecer alerta de casos prontos a vencer
 
 	    System.out.println("FEchas: " + fechaInicio + " | " + fechaFin );
 	    
@@ -1159,7 +1225,7 @@ System.out.println("Control");
           
          if(diffTime > 0){
         	 estadoSolucion = "Vigente";
-           if(h<47){
+           if(h<tiempoAlerta){
         	   estadoSolucion = "Pronto";
            }
          }else{
@@ -1176,6 +1242,142 @@ System.out.println("Control");
 	      System.out.println(map);
 		return map;
 						
+	}
+	
+	public ResponseWS procesosSuspendidos(Integer itemPorPagina, Integer primerItem, Date fechaInicio, Date fechaFin){ //Flowable automaticamente pone en "Dead Letter"/Suspendidos las Service task que finalizan sus reintentos y no consiguen una respuesta exitosa.
+		
+		ResponseWS oResponseWS = new ResponseWS();		
+		
+		List<Object> oProcesoList = new ArrayList<Object>();
+		
+		List<Job> listaProcesos = null;
+		
+		long totalProcesos = 0;
+
+		try {
+			
+			 log.info( "Suspendidos: "+ itemPorPagina+ primerItem+ fechaInicio+fechaFin);
+			 listaProcesos = managementService.createDeadLetterJobQuery()
+					 							.orderByJobDuedate()
+					 							.asc()
+					 							.listPage(primerItem, itemPorPagina);// Se obtienen los procesos es estado "suspendido" despues de algún error en un servicio
+	
+	
+				totalProcesos = managementService.createDeadLetterJobQuery()
+							.count();
+			
+			if (listaProcesos.size()>0) {
+				for (Job proceso : listaProcesos) {
+					log.info( "Suspendidos: "+ itemPorPagina+ primerItem+ fechaInicio+fechaFin);
+					ProcessInstance resultado = runtimeService.createProcessInstanceQuery()
+							.processInstanceId(proceso.getProcessInstanceId()).includeProcessVariables().singleResult();
+
+					Map<String, Object> map = new LinkedHashMap<>();
+					map.put("idConsecutivo", resultado.getProcessVariables().get("idConsecutivo"));
+					map.put("idProceso", proceso.getProcessInstanceId());
+					map.put("fechaError", proceso.getDuedate());
+					map.put("actividadError", proceso.getElementName());
+					map.put("mensajeError", proceso.getExceptionMessage());
+					map.put("idJob", proceso.getId());
+
+					oProcesoList.add(map);
+
+				}
+				oResponseWS.setTotalItems(totalProcesos);
+				oResponseWS.setListaResultado(oProcesoList);
+				oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
+				oResponseWS.setMensaje("Consulta realizada con exito");
+			}else {
+				oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
+				oResponseWS.setMensaje("No se encontraron resultados para la consulta.");
+			}
+			
+
+		} catch (Exception e) {
+			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
+			oResponseWS.setMensaje("Error obteniendo procesos con Error WS ");
+			log.error("Error obteniendo procesos con Error WS " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
+
+		}			
+
+		return oResponseWS;
+		
+	}
+	
+	public ResponseWS procesosErrorWS(Integer itemPorPagina, Integer primerItem, Date fechaInicio, Date fechaFin){ 
+		
+		ResponseWS oResponseWS = new ResponseWS();
+		
+	    List<Object> oProcesoList = new ArrayList<Object>();
+		
+		List<Job> listaProcesos = null;
+		
+		long totalProcesos = 0;
+	    
+		try {
+			
+			 log.info( "Con Error WS: "+ itemPorPagina+ primerItem+ fechaInicio+fechaFin);
+			 listaProcesos =  managementService.createTimerJobQuery()
+					 							.orderByJobDuedate()
+					 							.asc()
+					 							.listPage(primerItem, itemPorPagina);// Se obtienen los procesos es estado "suspendido" despues de algún error en un servicio
+	
+	
+				totalProcesos = managementService.createTimerJobQuery().count();
+			
+			if (listaProcesos.size()>0) {
+				for (Job proceso : listaProcesos) {
+					ProcessInstance resultado = runtimeService.createProcessInstanceQuery()
+							.processInstanceId(proceso.getProcessInstanceId()).includeProcessVariables().singleResult();
+
+					Map<String, Object> map = new LinkedHashMap<>();
+					map.put("idConsecutivo", resultado.getProcessVariables().get("idConsecutivo"));
+					map.put("idProceso", proceso.getProcessInstanceId());
+					map.put("fechaError", proceso.getDuedate());
+					map.put("actividadError", proceso.getElementName());
+					map.put("mensajeError", proceso.getExceptionMessage());
+					map.put("idJob", proceso.getId());
+
+					oProcesoList.add(map);
+
+				}
+				oResponseWS.setTotalItems(totalProcesos);
+				oResponseWS.setListaResultado(oProcesoList);
+				oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
+				oResponseWS.setMensaje("Consulta realizada con exito");
+			}else {
+				oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
+				oResponseWS.setMensaje("No se encontraron resultados para la consulta.");
+			}
+			
+
+		} catch (Exception e) {
+			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
+			oResponseWS.setMensaje("Error obteniendo procesos con Error WS ");
+			log.error("Error obteniendo procesos con Error WS " + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
+
+		}
+		
+		oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
+		
+		return oResponseWS;
+		
+	}
+	
+	public ResponseWS reintentarProcesoSuspendido(String idJob) {
+		
+		ResponseWS oResponseWS = new ResponseWS();
+		try {
+			managementService.moveDeadLetterJobToExecutableJob(idJob, 1);
+			oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
+			oResponseWS.setMensaje("Reintento programado con éxito ");
+		} catch (Exception e) {
+			log.error("Error programando reintento en proceso suspendido" + " | " + e.getMessage() + " | " + e.getCause() + " | " + e.getStackTrace()[0]);
+			oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
+			oResponseWS.setMensaje("Error programando reintento en proceso suspendido");
+		}
+
+		return oResponseWS;
 	}
 
 }

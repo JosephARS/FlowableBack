@@ -14,5 +14,6 @@ public class EstadoSolicitud {
 	public static final String OTRA_LINEA = "Otra linea de atencion";
 	public static final String TERMINADO = "Terminado";
 	public static final String ANULADO = "Anulado";
+	public static final String ERROR_SW = "Error respuesta SW";
 	
 }

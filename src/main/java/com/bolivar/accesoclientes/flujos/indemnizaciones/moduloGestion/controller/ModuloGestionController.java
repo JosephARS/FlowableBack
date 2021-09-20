@@ -1,9 +1,13 @@
 package com.bolivar.accesoclientes.flujos.indemnizaciones.moduloGestion.controller;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.flowable.task.api.Task;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,12 +16,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
 import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.model.ResponseWS;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.model.TipoRespuesta;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.moduloGestion.service.ModuloGestionService;
+import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.Analisis;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.VariablesProceso;
 
 import lombok.AccessLevel;
@@ -105,34 +111,54 @@ public class ModuloGestionController {
     @GetMapping("/historico/procesos/{procesosFinalizados}/{cantidadItems}/{primerItem}")
     public ResponseWS obtenerHistoriaProceso(@PathVariable("procesosFinalizados")Boolean procesosFinalizados,
 											@PathVariable("cantidadItems") Integer cantidadItems,
-											@PathVariable("primerItem") Integer primerItem){
-    	ResponseWS oResponseWS = new ResponseWS();
+											@PathVariable("primerItem") Integer primerItem,
+											@RequestParam(value = "fechaInicio", required=false) Date fechaInicio,
+											@RequestParam(value = "fechaFin", required=false) Date fechaFin){
     	
-    	oResponseWS = moduloGestionService.obtenerListaProcesosHistorico(procesosFinalizados, cantidadItems, primerItem);
+    	
+    	return moduloGestionService.obtenerListaProcesosHistorico(procesosFinalizados, cantidadItems, primerItem, fechaInicio,fechaFin);
     			
-    	return oResponseWS;
     }
     
     @GetMapping("/historico/procesos/pendientes/{cantidadItems}/{primerItem}")
     public ResponseWS obtenerListaProcesosPendientes(@PathVariable("cantidadItems") Integer cantidadItems,
-											@PathVariable("primerItem") Integer primerItem){
-    	
-    	ResponseWS oResponseWS = new ResponseWS();
-    	
-    	oResponseWS = moduloGestionService.obtenerListaProcesosPendientes(cantidadItems, primerItem);
-    			
-    	return oResponseWS;
+											@PathVariable("primerItem") Integer primerItem,
+											@RequestParam(value = "fechaInicio", required=false) Date fechaInicio,
+											@RequestParam(value = "fechaFin", required=false) Date fechaFin){
+    	System.out.println(fechaInicio + "/"+ fechaFin);
+    	return moduloGestionService.obtenerListaProcesosPendientes(cantidadItems, primerItem, fechaInicio,fechaFin);
+
     }
     
     @GetMapping("/historico/procesos/anulados/{cantidadItems}/{primerItem}")
     public ResponseWS obtenerListaProcesosAnulados(@PathVariable("cantidadItems") Integer cantidadItems,
-											@PathVariable("primerItem") Integer primerItem){
+											@PathVariable("primerItem") Integer primerItem,
+											@RequestParam(value = "fechaInicio", required=false) Date fechaInicio,
+											@RequestParam(value = "fechaFin", required=false) Date fechaFin){
     	
-    	ResponseWS oResponseWS = new ResponseWS();
-    	
-    	oResponseWS = moduloGestionService.obtenerListaProcesosAnulados(cantidadItems, primerItem);
+    	return  moduloGestionService.obtenerListaProcesosAnulados(cantidadItems, primerItem, fechaInicio,fechaFin);
     			
-    	return oResponseWS;
+
+    }
+    
+    @GetMapping("/historico/procesos/suspendidos/{cantidadItems}/{primerItem}")
+    public ResponseWS obtenerListaProcesosSuspendidos(@PathVariable("cantidadItems") Integer cantidadItems,
+											@PathVariable("primerItem") Integer primerItem,
+											@RequestParam(value = "fechaInicio", required=false) Date fechaInicio,
+											@RequestParam(value = "fechaFin", required=false) Date fechaFin){
+    	
+    	return  moduloGestionService.procesosSuspendidos(cantidadItems, primerItem, fechaInicio, fechaFin);
+    			
+    }
+    
+    @GetMapping("/historico/procesos/errorws/{cantidadItems}/{primerItem}")
+    public ResponseWS obtenerListaProcesosErrorWS(@PathVariable("cantidadItems") Integer cantidadItems,
+											@PathVariable("primerItem") Integer primerItem,
+											@RequestParam(value = "fechaInicio", required=false) Date fechaInicio,
+											@RequestParam(value = "fechaFin", required=false) Date fechaFin){
+    	
+    	return  moduloGestionService.procesosErrorWS(cantidadItems, primerItem, fechaInicio, fechaFin);		
+
     }
     
     @PostMapping("/usuario/tareaAtendida/{idTarea}/{idTareaDefinicion}/{idUsuario}")
@@ -140,23 +166,16 @@ public class ModuloGestionController {
 							    		@PathVariable("idTareaDefinicion") String idTareaDefinicion,
 							    		@PathVariable("idUsuario") String idUsuario,
 							    		@RequestBody VariablesProceso variablesProceso) {
-										
-    	ResponseWS oResponseWS = new ResponseWS();
     	
-    	oResponseWS = moduloGestionService.completarTarea(idTarea, idTareaDefinicion, idUsuario, variablesProceso);
-    	
-    	return oResponseWS;
+    	return moduloGestionService.completarTarea(idTarea, idTareaDefinicion, idUsuario, variablesProceso);
     	
     }
     
     @GetMapping("/procesos/historialCaso/{idProceso}")
     public ResponseWS obtenerHistorialCaso(@PathVariable("idProceso")String idProceso) {
     	
-    	ResponseWS oResponseWS = new ResponseWS();
-    	
-    	oResponseWS = moduloGestionService.obtenerHistorialCaso(idProceso);
+    	return moduloGestionService.obtenerHistorialCaso(idProceso);
     			
-    	return oResponseWS;
     }
     
     @GetMapping("/busqueda/{parametroBusqueda}/{valorBusqueda}/{itemPorPagina}/{primerItem}")
@@ -165,11 +184,8 @@ public class ModuloGestionController {
 									@PathVariable("itemPorPagina") Integer itemPorPagina,
 									@PathVariable("primerItem") Integer primerItem) {
     	
-    	ResponseWS oResponseWS = new ResponseWS();
-    	
-    	oResponseWS = moduloGestionService.busquedaGeneral(parametroBusqueda, valorBusqueda, itemPorPagina, primerItem);
-    			
-    	return oResponseWS;
+    	return moduloGestionService.busquedaGeneral(parametroBusqueda, valorBusqueda, itemPorPagina, primerItem);
+    
     }
     
     
@@ -198,4 +214,17 @@ public class ModuloGestionController {
 		return moduloGestionService.corregirActividadAnterior(variablesProceso);
 	}
     
+    @PutMapping("/procesos/analisis/{idProceso}")
+    public ResponseWS ingresarNuevoAnalisis(@PathVariable("idProceso")String idProceso,
+    										@RequestBody Analisis analisis) {
+        	
+    	return moduloGestionService.ingresarNuevoAnalisis(idProceso, analisis);
+    }
+    
+    @PostMapping("/historico/procesos/suspendidos/{idJob}")
+    public ResponseWS obtenerListaProcesosSuspendidos(@PathVariable("idJob") String idJob){
+    	
+    	return  moduloGestionService.reintentarProcesoSuspendido(idJob);
+    			
+    }
 }

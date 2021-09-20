@@ -23,7 +23,7 @@ public class ActualizarValorReservaService {
 	@Autowired
 	InfoGeneralProcesoRepository infoProcesoRepository;
 
-	public boolean consultaServicioSimon(VariablesProceso variablesProceso, String tipoEvento) {
+	public boolean consultaServicioSimon(VariablesProceso variablesProceso) {
 		
 		
 		Long respuesta = (long) 100000;
@@ -31,7 +31,7 @@ public class ActualizarValorReservaService {
 		Long valorActual = variablesProceso.getSiniestro().getValorReserva();
 		log.info(respuesta.toString(), valorActual.toString());
 		
-		if (respuesta != valorActual) {
+		if (!respuesta.equals(valorActual)) {
 			
 			String idProceso = variablesProceso.getInfoProceso().getIdProceso();
 			

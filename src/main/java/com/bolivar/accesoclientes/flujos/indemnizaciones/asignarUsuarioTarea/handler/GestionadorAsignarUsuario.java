@@ -90,12 +90,12 @@ public class GestionadorAsignarUsuario implements TaskListener {
 		
 		}
 	  
-	    public String generarUsuario() {
-	        List<String> listaUsuarios = Arrays.asList("Analista1");//("Analista1","Analista2","Analista3");
-	        Random random = new Random();
-	        String randomElement = listaUsuarios.get(random.nextInt(listaUsuarios.size()));
-			return randomElement;
-	    }	    
+//	    public String generarUsuario() {
+//	        List<String> listaUsuarios = Arrays.asList("Analista1");//("Analista1","Analista2","Analista3");
+//	        Random random = new Random();
+//	        String randomElement = listaUsuarios.get(random.nextInt(listaUsuarios.size()));
+//			return randomElement;
+//	    }	    
 	    
 
 }

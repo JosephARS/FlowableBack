@@ -2,6 +2,10 @@ package com.bolivar.accesoclientes.flujos.indemnizaciones.util.model;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
+import org.springframework.validation.annotation.Validated;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -13,11 +17,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class VariablesProceso {
 		
-	
+	@Valid
 	InfoProceso infoProceso;
+	@Valid
 	Asegurado asegurado;
 	InfoProducto infoProducto;
-	//Caso caso;
 	Siniestro siniestro;
 	
 		@JsonInclude(JsonInclude.Include.NON_NULL)

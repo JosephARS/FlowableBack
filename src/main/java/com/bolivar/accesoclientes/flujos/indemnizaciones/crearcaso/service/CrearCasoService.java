@@ -47,7 +47,6 @@ import lombok.extern.slf4j.Slf4j;
 public class CrearCasoService implements CrearCasoDAO {
 
 	public static final String PROCESS_DEFINITION_KEY = "idIndemnizacionesGen";
-	public static String USUARIO_CREADOR = "";
 
 	RuntimeService runtimeService;
 	TaskService taskService;
@@ -129,7 +128,7 @@ public class CrearCasoService implements CrearCasoDAO {
 			try {
 
 				Map<String, Object> variables = new HashMap<String, Object>();
-				USUARIO_CREADOR = procesoIndemnizacion.getInfoProceso().getUsuarioCreador();
+				String usuarioCreador = procesoIndemnizacion.getInfoProceso().getUsuarioCreador();
 				variables.put("estadoCreacion", procesoIndemnizacion.getInfoProceso().getEstadoCreacion());
 				variables.put("fechaCreacion", new Date());
 				variables.put("canalCreacion", procesoIndemnizacion.getInfoProceso().getCanalCreacion());
@@ -150,7 +149,7 @@ public class CrearCasoService implements CrearCasoDAO {
 				}
 				
 
-				identityService.setAuthenticatedUserId(USUARIO_CREADOR);
+				identityService.setAuthenticatedUserId(usuarioCreador);
 				
 				log.info("VariablesIn: " + variables);
 
