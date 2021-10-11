@@ -365,39 +365,42 @@ public class ModuloGestionService implements ModuloGestionDAO {
 			ObjCodigoValor canalCreacion = null;
 			String estadoCaso = "";
 			if (procesoIndemnizacion.isPresent()) {
+				System.out.println(procesoIndemnizacion.get());
 				canalCreacion =  procesoIndemnizacion.get().getDocumento().getInfoProceso()
 						.getCanalCreacion();
 				estadoCaso = procesoIndemnizacion.get().getDocumento().getInfoProceso().getEstadoSolicitud();
+
+				metadataMap.put("idConsecutivo",
+						procesoIndemnizacion.get().getDocumento().getInfoProceso().getIdConsecutivo());
+				metadataMap.put("fechaInicio", datosProceso.getStartTime());
+				metadataMap.put("usuarioCreador", datosProceso.getStartUserId());
+				metadataMap.put("canalCreacion", canalCreacion);
+				metadataMap.put("estadoCaso", estadoCaso);
+	
+				//VariablesProceso oVariablesProceso = procesoIndemnizacion.get().getDocumento();
+	
+				map.put("xml", xml);
+				map.put("idProceso", datosProceso.getId());
+				map.put("metadata", metadataMap);
+				map.put("infoProceso", procesoIndemnizacion.get().getDocumento().getInfoProceso());
+				map.put("asegurado", procesoIndemnizacion.get().getDocumento().getAsegurado());
+				map.put("infoProducto", procesoIndemnizacion.get().getDocumento().getInfoProducto());
+				map.put("siniestro", procesoIndemnizacion.get().getDocumento().getSiniestro());
+				map.put("canalAtencion", procesoIndemnizacion.get().getDocumento().getCanalAtencion());
+				map.put("pago", procesoIndemnizacion.get().getDocumento().getPago());
+				map.put("anulacion", procesoIndemnizacion.get().getDocumento().getAnulacion());
+				map.put("objecion", procesoIndemnizacion.get().getDocumento().getObjecion());
+				map.put("ajustador", procesoIndemnizacion.get().getDocumento().getAjustador());
+				map.put("historialAnalisis", procesoIndemnizacion.get().getHistorialAnalisis());
+				
+				oResponseWS.setResultado(map);
+				oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
+			}else {
+				oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
+				oResponseWS.setMensaje("Error obteniendo datos del formulario " );
+				System.out.println("Error");
 			}
-			
 
-			
-
-			metadataMap.put("idConsecutivo",
-					procesoIndemnizacion.get().getDocumento().getInfoProceso().getIdConsecutivo());
-			metadataMap.put("fechaInicio", datosProceso.getStartTime());
-			metadataMap.put("usuarioCreador", datosProceso.getStartUserId());
-			metadataMap.put("canalCreacion", canalCreacion);
-			metadataMap.put("estadoCaso", estadoCaso);
-
-			//VariablesProceso oVariablesProceso = procesoIndemnizacion.get().getDocumento();
-
-			map.put("xml", xml);
-			map.put("idProceso", datosProceso.getId());
-			map.put("metadata", metadataMap);
-			map.put("infoProceso", procesoIndemnizacion.get().getDocumento().getInfoProceso());
-			map.put("asegurado", procesoIndemnizacion.get().getDocumento().getAsegurado());
-			map.put("infoProducto", procesoIndemnizacion.get().getDocumento().getInfoProducto());
-			map.put("siniestro", procesoIndemnizacion.get().getDocumento().getSiniestro());
-			map.put("canalAtencion", procesoIndemnizacion.get().getDocumento().getCanalAtencion());
-			map.put("pago", procesoIndemnizacion.get().getDocumento().getPago());
-			map.put("anulacion", procesoIndemnizacion.get().getDocumento().getAnulacion());
-			map.put("objecion", procesoIndemnizacion.get().getDocumento().getObjecion());
-			map.put("ajustador", procesoIndemnizacion.get().getDocumento().getAjustador());
-			map.put("historialAnalisis", procesoIndemnizacion.get().getHistorialAnalisis());
-
-			oResponseWS.setResultado(map);
-			oResponseWS.setTipoRespuesta(TipoRespuesta.Exito);
 
 		} catch (Exception e) {
 			oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
@@ -723,21 +726,19 @@ public class ModuloGestionService implements ModuloGestionDAO {
 				System.out.println(idTareaDefinicion);
 				log.info("objecto: " + variablesProceso);
 
-				Boolean reservaActualizada = actualizarValorReservaService.consultaServicioSimon(variablesProceso);
-				log.info(reservaActualizada.toString());
+				long reservaActualizada = actualizarValorReservaService.consultaServicioSimon(variablesProceso);
 
-				if (reservaActualizada) {
+				if (reservaActualizada > 0) {
 					Long valorReserva = variablesProceso.getSiniestro().getValorReserva();
 
 					log.info(valorReserva + idTareaDefinicion);
 					variables.put("valorReserva", valorReserva);
-					//taskService.addUserIdentityLink(idTarea, idUsuario, "assignee");
 					taskService.complete(idTarea, variables);
 					usuariosRepository.P_TAREA_CERRADA(idUsuario, "Completada");
 				} else {
 					oResponseWS.setTipoRespuesta(TipoRespuesta.Error);
-					oResponseWS.setMensaje("El valor de la reserva no se ha modificado, por favor valide ");
-					log.error("El valor de la reserva no se ha modificado, por favor valide ");
+					oResponseWS.setMensaje("El valor de la reserva no se ha modificado, por favor valide" );
+					log.error("El valor de la reserva no se ha modificado, por favor valide " + "|" + variablesProceso);
 				}
 
 				break;

@@ -14,8 +14,8 @@ import lombok.Data;
 @JsonIgnoreProperties
 public class Siniestro {
 
-	Long numeroSiniestro;
-	Long valorReserva;
+	Long numeroSiniestro = (long) 0;
+	Long valorReserva = (long) 0;
 	@NotNull
 	Long valorPretension;
 	@NotNull

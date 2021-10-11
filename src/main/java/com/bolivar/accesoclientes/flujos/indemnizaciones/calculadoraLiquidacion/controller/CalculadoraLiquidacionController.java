@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.calculadoraLiquidacion.service.CalculadoraLiquidacionService;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.model.ResponseWS;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -25,6 +26,7 @@ public class CalculadoraLiquidacionController {
 
 	CalculadoraLiquidacionService calculadoraLiquidacionService;
 	
+	@Operation(summary = "Notificar al flujo si el cliente acepta preliquidación")
     @PutMapping("/preliquidacion/{IdProceso}/{clienteAcepta}")
     public ResponseWS mensajePreliquidacion(@PathVariable("clienteAcepta") Boolean clienteAcepta, @PathVariable("IdProceso") String idProceso){    	
 

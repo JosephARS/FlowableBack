@@ -68,10 +68,10 @@ public interface InfoGeneralProcesoRepository extends JpaRepository<InfoGeneralP
     @Query(value = "update info_general_proceso set documento = JSON_INSERT(documento, \"$.pago\", JSON_OBJECT(\"valorPago\", :valorPago)) where idProceso = :idProceso" , nativeQuery = true)
     int updateValorByIdProceso(@Param("idProceso") String idProceso, @Param ("valorPago") Long valor);
 
-	@Transactional
-	@Modifying
-    @Query(value = "update info_general_proceso set documento = JSON_SET(documento, \"$.siniestro.valorReserva\", :valorReserva, \"$.siniestro.tipoEvento\", :tipoEvento) where idProceso = :idProceso" , nativeQuery = true)
-    int updateValorReserva(@Param("idProceso") String idProceso, @Param ("valorReserva") Long valorReserva, @Param("tipoEvento") String tipoEvento);
+//	@Transactional
+//	@Modifying
+//    @Query(value = "update info_general_proceso set documento = JSON_SET(documento, \"$.siniestro.valorReserva\", :valorReserva, \"$.siniestro.tipoEvento\", :tipoEvento) where idProceso = :idProceso" , nativeQuery = true)
+//    int updateValorReserva(@Param("idProceso") String idProceso, @Param ("valorReserva") Long valorReserva, @Param("tipoEvento") String tipoEvento);
 	
 	@Transactional
 	@Modifying

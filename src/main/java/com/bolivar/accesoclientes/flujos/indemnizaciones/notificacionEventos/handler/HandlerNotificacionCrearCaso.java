@@ -49,7 +49,7 @@ public class HandlerNotificacionCrearCaso implements JavaDelegate {
 			String idProceso = execution.getRootProcessInstanceId();
 			
 			Optional<InfoGeneralProceso> oInfoGeneralProceso = infoProcesoRepository.findByIdProceso(idProceso);
-			
+			log.info("eventos: " + oInfoGeneralProceso.get());
 			String ramo = oInfoGeneralProceso.get().getDocumento().getInfoProducto().getRamo().getValor();
 			
 			String NOTIFICACION_EVENTOS = "spring.profiles.notificacionEventos";
@@ -106,7 +106,7 @@ public class HandlerNotificacionCrearCaso implements JavaDelegate {
 			
 		} catch (Exception e) {
 			log.error("Error en servicio de Eventos " + " | " + e.getMessage() + " | " + e.getClass() + " | "
-					+ e.getLocalizedMessage());
+					+ e.getStackTrace()[0]);
 		}
 
 	}

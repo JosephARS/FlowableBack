@@ -5,12 +5,12 @@
   <process id="idIndemnizacionesGen" name="IndemnizacionesGenerales" isExecutable="true">
     <documentation>Flujo para indemnizaciones generales SB</documentation>
     <startEvent id="inicioFlujoGenerales" name="Inicio nuevo proceso" flowable:formFieldValidation="true"></startEvent>
-    <serviceTask id="NotificacionClienteCreacionDeCaso" name="Notificacion Cliente Creacion De Caso" flowable:delegateExpression="${handlerNotificacionCrearCaso}"></serviceTask>
+    <serviceTask id="NotificacionClienteCreacionDeCaso" name="Notificacion Cliente Creacion De Caso"  flowable:async="true" flowable:delegateExpression="${handlerNotificacionCrearCaso}"></serviceTask>
     <endEvent id="sid-9389723C-4735-40AF-A8A8-BF9E670153A4"></endEvent>
     <sequenceFlow id="sid-002F96AD-A4E3-4ACE-822B-A1F89CF8733A" sourceRef="NotificacionClienteCreacionDeCaso" targetRef="sid-9389723C-4735-40AF-A8A8-BF9E670153A4"></sequenceFlow>
     <sequenceFlow id="sid-05A0D9D7-7E71-404F-9233-60D00DF94C58" sourceRef="Compuerta1" targetRef="CanalCreacion"></sequenceFlow>
     <exclusiveGateway id="CanalCreacion" name="Canal creacion"></exclusiveGateway>
-    <serviceTask id="CreacionSiniestro" name="Creacion Siniestro" flowable:delegateExpression="${gestionarCrearSiniestroSimon}"></serviceTask>
+    <serviceTask id="CreacionSiniestro" name="Creacion Siniestro" flowable:async="true" flowable:delegateExpression="${gestionarCrearSiniestroSimon}"></serviceTask>
     <inclusiveGateway id="sid-C0069F83-68E9-4A1A-BBC7-B6364D9F45F8"></inclusiveGateway>
     <exclusiveGateway id="CompuertaReservayClasificacion" name="Reserva Mayor a cero y Caso No objetado" default="sid-9C25B74D-F97D-4318-84AC-603AC6345B3A"></exclusiveGateway>
     <manualTask id="CreacionReservaEnSimon" name="Creacion reserva en Simon"></manualTask>

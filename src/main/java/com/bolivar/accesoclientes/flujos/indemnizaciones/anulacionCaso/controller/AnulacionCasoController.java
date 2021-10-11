@@ -11,6 +11,7 @@ import com.bolivar.accesoclientes.flujos.indemnizaciones.anulacionCaso.service.A
 import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.model.ResponseWS;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.Anulacion;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -25,6 +26,7 @@ public class AnulacionCasoController {
 	
 	AnulacionCasoService anulacionCasoService;
 	
+	@Operation(summary = "Anular un proceso activo", description = "Anulacion pruebitas")
     @PutMapping("/procesos/anular/{IdProceso}")
     public ResponseWS anularCaso(@PathVariable("IdProceso") String idProceso,
     							@RequestBody Anulacion datosAnulacion){    	

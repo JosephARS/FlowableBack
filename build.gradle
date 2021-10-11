@@ -15,6 +15,7 @@ repositories {
 }
 
 dependencies {
+  	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -24,6 +25,10 @@ dependencies {
 	implementation 'javax.persistence:javax.persistence-api:2.2'
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.4'
 	implementation ('net.sf.jasperreports:jasperreports:6.17.0')
+	implementation 'io.springfox:springfox-boot-starter:3.0.0'
+
+
+	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	compileOnly "org.flowable:flowable-spring-boot-starter:6.6.0"
 	runtimeOnly 'mysql:mysql-connector-java:8.0.22'

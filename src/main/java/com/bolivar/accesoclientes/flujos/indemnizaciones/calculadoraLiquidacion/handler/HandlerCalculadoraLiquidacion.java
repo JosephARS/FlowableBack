@@ -151,7 +151,7 @@ public class HandlerCalculadoraLiquidacion implements JavaDelegate {
 
 
 			}  catch (Exception e) {
-				log.error("Error en calculadora liquidacion " + " | " + e.getMessage() + " | " + e.getClass() + " | " + e.getLocalizedMessage() );
+				log.error("Error en calculadora liquidacion " + " | " + e.getMessage() + " | " + e.getClass() + " | " + e.getStackTrace()[0] );
 				infoProcesoRepository.P_ACTUALIZAR_ESTADO(idProceso, EstadoSolicitud.ERROR_SW);
 				throw new FlowableException(e.getMessage());
 			} 

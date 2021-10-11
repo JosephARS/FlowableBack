@@ -5,7 +5,7 @@ spring:
     notificacionEventos: "https://fz73xehwah.execute-api.us-east-1.amazonaws.com/dev/notificacion/api/v1/mensajeria/eventos/mensajes"
     calculadoraLiquidacion: "https://fz73xehwah.execute-api.us-east-1.amazonaws.com/dev/poliza/api/v1/siniestros/calculadora"
     crearSiniestroSimon: "https://fz73xehwah.execute-api.us-east-1.amazonaws.com/dev/poliza/api/v1/siniestros"
-
+    consultaValorReserva: "https://fz73xehwah.execute-api.us-east-1.amazonaws.com/dev/poliza/api/v1/siniestros/reservas"
   jpa:    database: mysql
     show-sql: true
 
@@ -55,5 +55,8 @@ variable:
     crearCaso:
       aplicacion: "J0ETQ70N6H8ELEY"
       evento: "LPSEQMW2DH7J8OO"
-    
+
+springdoc:
+  swagger-ui:
+    path:swagger-ui.html
     

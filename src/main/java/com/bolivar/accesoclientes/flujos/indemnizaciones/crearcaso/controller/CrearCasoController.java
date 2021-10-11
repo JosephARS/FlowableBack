@@ -25,6 +25,7 @@ import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.model.Respons
 import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.service.CrearCasoService;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.VariablesProceso;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -48,6 +49,7 @@ public class CrearCasoController {
     	return "ok";
     }
     
+    @Operation(summary = "Crear un nuevo caso en el flujo de trabajo (Flowable)")
     @PostMapping(path = "/casos")
     public ResponseWS registrarNuevoCaso(@Valid @RequestBody VariablesProceso procesoIndemnizacion) {
     	ResponseWS oResponseWS = crearCasoService.registrarNuevoCaso(procesoIndemnizacion);
@@ -59,11 +61,11 @@ public class CrearCasoController {
     	return oResponseWS;
     }
 	
-    @GetMapping("/procesos/{IdProceso}")		//VERIFICAR LAS TAREAS POR LAS QUE HA PASADO UNA SOLICITUD
-    public List<Object> checkState(@PathVariable("IdProceso") String processId){
-    	log.info("Historico proceso: " + processId);
-    	return crearCasoService.trazaHistoricoProceso(processId);
-    }
+//    @GetMapping("/procesos/{IdProceso}")		//VERIFICAR LAS TAREAS POR LAS QUE HA PASADO UNA SOLICITUD
+//    public List<Object> checkState(@PathVariable("IdProceso") String processId){
+//    	log.info("Historico proceso: " + processId);
+//    	return crearCasoService.trazaHistoricoProceso(processId);
+//    }
     
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
