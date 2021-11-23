@@ -1,6 +1,5 @@
 package com.bolivar.accesoclientes.flujos.indemnizaciones.util.model;
 
-import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

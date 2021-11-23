@@ -24,16 +24,17 @@ public class InfoProducto {
 	@NotNull
 	ObjCodigoValor producto;				//Codigo-Valor
 	@NotBlank
-	Long numeroPoliza;	
+	Long numeroPoliza;
+	@NotBlank
+	Long numSecuPoliza;
+	@NotBlank
+	Long numEndoso;
 	@Valid
 	@NotNull
-	List<ObjCodigoValor> causa;						//ArrayList[Codigo-Valor]
+	ObjCodigoValor causa;						//ArrayList[Codigo-Valor]
 	@Valid
 	@NotNull
-	List<ObjCodigoValor> consecuencia;		//ArrayList[Codigo-Valor]
-	@Valid
-	@NotNull
-	List<ObjCodigoValor> cobertura;				//ArrayList[Codigo-Valor]
+	List<Cobertura> cobertura;				//ArrayList[Codigo-Valor]
 	@Valid
 	@NotNull
 	ObjCodigoValor riesgo;

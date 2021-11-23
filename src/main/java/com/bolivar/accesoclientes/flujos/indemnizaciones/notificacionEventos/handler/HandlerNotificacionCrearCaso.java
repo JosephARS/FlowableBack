@@ -1,6 +1,5 @@
 package com.bolivar.accesoclientes.flujos.indemnizaciones.notificacionEventos.handler;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -8,9 +7,6 @@ import java.util.Optional;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -18,7 +14,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import com.bolivar.accesoclientes.flujos.indemnizaciones.notificacionEventos.model.Dato;
-import com.bolivar.accesoclientes.flujos.indemnizaciones.notificacionEventos.model.DatoBinario;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.notificacionEventos.model.Grupo;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.notificacionEventos.model.RequestEventosDTO;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.notificacionEventos.model.ResponseEventosDTO;
@@ -27,7 +22,6 @@ import com.bolivar.accesoclientes.flujos.indemnizaciones.util.repository.InfoGen
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -53,20 +47,18 @@ public class HandlerNotificacionCrearCaso implements JavaDelegate {
 			String ramo = oInfoGeneralProceso.get().getDocumento().getInfoProducto().getRamo().getValor();
 			
 			String NOTIFICACION_EVENTOS = "spring.profiles.notificacionEventos";
-			String APLICACION = "variable.notificacionEventos.crearCaso.aplicacion";
-			String EVENTO = "variable.notificacionEventos.crearCaso.evento";
+			String APLICACION = "servicios.notificacionEventos.crearCaso.aplicacion";
+			String EVENTO = "servicios.notificacionEventos.crearCaso.evento";
+			String API_KEY = "servicios.notificacionEventos.apiKey";
 
 			String idConsecutivo = (String) execution.getVariable("idConsecutivo");
-
-
-			//String urlString = "https://fz73xehwah.execute-api.us-east-1.amazonaws.com/dev/notificacion/api/v1/mensajeria/eventos/mensajes";
 
 			String urlString = env.getProperty(NOTIFICACION_EVENTOS);
 			
 			System.out.println("URL:" + urlString);
 
 			HttpHeaders headers = new HttpHeaders();
-			headers.add("x-api-key", "1KN83VVMjx9l7fQIATjnR6RtvJbc4xxm284tuda8");
+			headers.add("x-api-key", env.getProperty(API_KEY));
 
 			RequestEventosDTO request = new RequestEventosDTO();
 			request.setAplicacion(env.getProperty(APLICACION));

@@ -1,15 +1,10 @@
 package com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.service;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
-
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.ProcessEngine;
@@ -20,6 +15,7 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.DAO.CrearCasoDAO;
@@ -48,6 +44,9 @@ public class CrearCasoService implements CrearCasoDAO {
 
 	public static final String PROCESS_DEFINITION_KEY = "idIndemnizacionesGen";
 
+	@Autowired
+	Environment env;
+	
 	RuntimeService runtimeService;
 	TaskService taskService;
 	ProcessEngine processEngine;
@@ -72,34 +71,42 @@ public class CrearCasoService implements CrearCasoDAO {
 
 		HistoryService historyService = processEngine.getHistoryService();		
 
-		List<HistoricProcessInstance> procesos = historyService.createHistoricProcessInstanceQuery() 	// Se valida si ya existe un caso creado con los mismos datos.
-				.variableValueEquals("numeroDocumento", procesoIndemnizacion.getAsegurado().getNumeroDocumento())
-				.includeProcessVariables()
-				.unfinished()
-				.list();
+		String validarProcesoRepetido = env.getProperty("variable.name.validarProcesoRepetido","true");
 		
-		List<String> conteoProcesosActivos = new ArrayList<String>();
+		List<InfoGeneralProceso> procesosEncontrados =  new ArrayList<InfoGeneralProceso>();
 		
-		procesos.forEach(proceso -> {
-			conteoProcesosActivos.add(proceso.getId());
-        });
-		
-		List<InfoGeneralProceso> validarProcesoRepetido = infoProcesoRepository.findByIdProcesoIn(conteoProcesosActivos);
-		
-		//List<InfoGeneralProceso> prueba = infoProcesoRepository.findByIdentificacionAsegurado(procesoIndemnizacion.getAsegurado().getNumeroDocumento());
-		
-		
-		System.out.println("Procesos cantidad: " + validarProcesoRepetido.size());
-		validarProcesoRepetido.clear();
-		
-		if (validarProcesoRepetido.size() > 0) {
+		if (validarProcesoRepetido.equalsIgnoreCase("true")) {	
 			
-			for (InfoGeneralProceso proceso : validarProcesoRepetido) {		//Compara que los casos encontrados sean diferentes alcaso que se va a crear.
+			List<HistoricProcessInstance> procesos = historyService.createHistoricProcessInstanceQuery() 	// Se valida si ya existe un caso creado con los mismos datos.
+					.variableValueEquals("numeroDocumento", procesoIndemnizacion.getAsegurado().getNumeroDocumento())
+					.includeProcessVariables()
+					.unfinished()
+					.list();
+			
+			List<String> conteoProcesosActivos = new ArrayList<String>();
+			
+			procesos.forEach(proceso -> {
+				conteoProcesosActivos.add(proceso.getId());
+	        });
+			
+			procesosEncontrados = infoProcesoRepository.findByIdProcesoIn(conteoProcesosActivos);
+			
+			//List<InfoGeneralProceso> prueba = infoProcesoRepository.findByIdentificacionAsegurado(procesoIndemnizacion.getAsegurado().getNumeroDocumento());
+			
+			
+			System.out.println("Procesos cantidad: " + procesosEncontrados.size());
+		}
+		
+		//procesosEncontrados.clear();
+		
+		if (procesosEncontrados.size() > 0) {
+			
+			for (InfoGeneralProceso proceso : procesosEncontrados) {		//Compara que los casos encontrados sean diferentes alcaso que se va a crear.
 				
 				Boolean FechaSiniestroExiste = (procesoIndemnizacion.getSiniestro().getFechaSiniestro().equals(proceso.getDocumento().getSiniestro().getFechaSiniestro()));
 				Boolean NumeroPolizaExiste =  (procesoIndemnizacion.getInfoProducto().getNumeroPoliza().equals(proceso.getDocumento().getInfoProducto().getNumeroPoliza()));
 				Boolean CausaExiste =  (procesoIndemnizacion.getInfoProducto().getCausa().equals(proceso.getDocumento().getInfoProducto().getCausa()));
-				Boolean ConsecuenciaExiste =  (procesoIndemnizacion.getInfoProducto().getConsecuencia().equals(proceso.getDocumento().getInfoProducto().getConsecuencia()));
+//				Boolean ConsecuenciaExiste =  (procesoIndemnizacion.getInfoProducto().getConsecuencia().equals(proceso.getDocumento().getInfoProducto().getConsecuencia()));
 				Boolean CoberturaExiste =  (procesoIndemnizacion.getInfoProducto().getCobertura().equals(proceso.getDocumento().getInfoProducto().getCobertura()));
 
 //				log.info(FechaSiniestroExiste.toString());
@@ -108,7 +115,7 @@ public class CrearCasoService implements CrearCasoDAO {
 //				log.info(ConsecuenciaExiste.toString());
 //				log.info(CoberturaExiste.toString());
 				
-				if (FechaSiniestroExiste && NumeroPolizaExiste && CausaExiste && ConsecuenciaExiste && CoberturaExiste) {
+				if (FechaSiniestroExiste && NumeroPolizaExiste && CausaExiste && CoberturaExiste) {
 					CasoDuplicado=true;
 					break;
 				}

@@ -1,11 +1,5 @@
 package com.bolivar.accesoclientes.flujos.indemnizaciones.actualizarValorReserva.service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import org.flowable.common.engine.api.FlowableException;
-import org.flowable.engine.RuntimeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
@@ -13,29 +7,16 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.bolivar.accesoclientes.flujos.indemnizaciones.actualizarValorReserva.model.ResponseConsultaReserva;
-import com.bolivar.accesoclientes.flujos.indemnizaciones.crearSiniestroSimon.model.RequestCrearSiniestro;
-import com.bolivar.accesoclientes.flujos.indemnizaciones.crearSiniestroSimon.model.ResponseCrearSiniestro;
-import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.EstadoSolicitud;
-import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.InfoGeneralProceso;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.VariablesProceso;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.repository.InfoGeneralProcesoRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
-//@Service
-//@FieldDefaults(level = AccessLevel.PRIVATE)
-//@AllArgsConstructor(onConstructor = @__(@Autowired))
 @Component
 @Slf4j
 public class ActualizarValorReservaService {

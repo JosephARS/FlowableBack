@@ -16,6 +16,11 @@ import lombok.extern.slf4j.Slf4j;
 public class HandlerFinInstanciaPagado implements ExecutionListener{
     
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Autowired
 	InfoGeneralProcesoRepository infoProcesoRepository;
 	

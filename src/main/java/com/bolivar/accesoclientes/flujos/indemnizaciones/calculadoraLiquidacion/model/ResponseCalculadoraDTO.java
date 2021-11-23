@@ -10,6 +10,9 @@ import lombok.ToString;
 public class ResponseCalculadoraDTO {
 
 	Long codRespuesta;
-	Long valIndemnizar;
-	List<DetIndemnizar> detIndemnizar;
+	Long motorClasCons;
+	Long motorDefCons;
+	Long valorIndemnizar;
+	List<DiscriminadoResp> discRespList;
+	List<ConsolidadoResp> consRespList;
 }

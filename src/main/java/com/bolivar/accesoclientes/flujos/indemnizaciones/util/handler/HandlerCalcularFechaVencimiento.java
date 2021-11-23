@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.Tarea;
-import com.bolivar.accesoclientes.flujos.indemnizaciones.util.repository.InfoGeneralProcesoRepository;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.repository.TareaRepository;
 
 import lombok.extern.slf4j.Slf4j;

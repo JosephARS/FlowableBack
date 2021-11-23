@@ -6,6 +6,8 @@ spring:
     calculadoraLiquidacion: "https://fz73xehwah.execute-api.us-east-1.amazonaws.com/dev/poliza/api/v1/siniestros/calculadora"
     crearSiniestroSimon: "https://fz73xehwah.execute-api.us-east-1.amazonaws.com/dev/poliza/api/v1/siniestros"
     consultaValorReserva: "https://fz73xehwah.execute-api.us-east-1.amazonaws.com/dev/poliza/api/v1/siniestros/reservas"
+    gestorDocumentalUpload: "https://fz73xehwah.execute-api.us-east-1.amazonaws.com/dev/documentos_archivo/lambda/v1/upload"
+    gestorDocumentalDownload: "https://fz73xehwah.execute-api.us-east-1.amazonaws.com/dev/download"
   jpa:    database: mysql
     show-sql: true
 
@@ -51,10 +53,19 @@ info:
 variable:
   name:
     reintentos: 3
+    validarProcesoRepetido: false
+    
+servicios:
   notificacionEventos:
+    apiKey: "1KN83VVMjx9l7fQIATjnR6RtvJbc4xxm284tuda8"
     crearCaso:
       aplicacion: "J0ETQ70N6H8ELEY"
       evento: "LPSEQMW2DH7J8OO"
+    objecion:
+      aplicacion: "J0ETQ70N6H8ELEY"
+      evento: "LPSEQMW2DH7J8OO"
+  crearSiniestroSimon:
+    apiKey: "4Qsus5DlSD8gXesXfEBzN4ZBRrXaw67e4IQ6CFZX"
 
 springdoc:
   swagger-ui:

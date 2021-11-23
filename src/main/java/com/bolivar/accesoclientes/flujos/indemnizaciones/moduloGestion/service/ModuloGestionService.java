@@ -2,11 +2,7 @@ package com.bolivar.accesoclientes.flujos.indemnizaciones.moduloGestion.service;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,8 +24,6 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ActivityInstance;
-import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.ExecutionQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Comment;
 import org.flowable.eventsubscription.api.EventSubscription;
@@ -65,7 +59,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import liquibase.pro.packaged.a;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -80,7 +73,6 @@ public class ModuloGestionService implements ModuloGestionDAO {
 	TaskService taskService;
 	RuntimeService runtimeService;
 	ProcessEngine processEngine;
-	RepositoryService repositoryService;
 	InfoGeneralProcesoRepository infoProcesoRepository;
 	ManagementService managementService;
 	UsuariosRepository usuariosRepository;
@@ -226,7 +218,6 @@ public class ModuloGestionService implements ModuloGestionDAO {
 
 		List<Object> oProcesoList = new ArrayList<Object>();
 
-		HistoryService historyService = processEngine.getHistoryService();
 
 		try {
 			List<ProcessInstance> procesos = runtimeService.createProcessInstanceQuery() // Se valida los procesos
@@ -606,7 +597,6 @@ public class ModuloGestionService implements ModuloGestionDAO {
 
 		List<Object> oProcesoList = new ArrayList<Object>();
 
-		HistoryService historyService = processEngine.getHistoryService();
 		
 		List<EventSubscription> procesos = null;
 		

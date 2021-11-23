@@ -1,15 +1,7 @@
 package com.bolivar.accesoclientes.flujos.indemnizaciones.moduloGestion.controller;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import org.flowable.task.api.Task;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.model.ResponseWS;
-import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.model.TipoRespuesta;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.moduloGestion.service.ModuloGestionService;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.Analisis;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.VariablesProceso;
@@ -128,7 +119,7 @@ public class ModuloGestionController {
     			
     }
     
-	@Operation(summary = "Obtener procesos en espera que se produzca un evento")
+	@Operation(summary = "Obtener procesos en espera de que se produzca un evento")
     @GetMapping("/historico/procesos/pendientes/{cantidadItems}/{primerItem}")
     public ResponseWS obtenerListaProcesosPendientes(@PathVariable("cantidadItems") Integer cantidadItems,
 											@PathVariable("primerItem") Integer primerItem,
@@ -173,13 +164,14 @@ public class ModuloGestionController {
 
     }
     
-	@Operation(summary = "Confirmar que se completó una tarea")
+	//@Operation(summary = "Confirmar que se completó una tarea")
     @PostMapping("/usuario/tareaAtendida/{idTarea}/{idTareaDefinicion}/{idUsuario}")
     public ResponseWS completarTarea(@PathVariable("idTarea") String idTarea,
 							    		@PathVariable("idTareaDefinicion") String idTareaDefinicion,
 							    		@PathVariable("idUsuario") String idUsuario,
 							    		@RequestBody VariablesProceso variablesProceso) {
-    	
+		System.out.println(idTareaDefinicion);
+		log.info("objecto: " + variablesProceso);
     	return moduloGestionService.completarTarea(idTarea, idTareaDefinicion, idUsuario, variablesProceso);
     	
     }

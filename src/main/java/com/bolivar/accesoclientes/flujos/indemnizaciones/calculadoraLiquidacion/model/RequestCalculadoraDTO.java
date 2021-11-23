@@ -1,7 +1,6 @@
 package com.bolivar.accesoclientes.flujos.indemnizaciones.calculadoraLiquidacion.model;
 
-import java.math.BigDecimal;
-import java.util.Date;
+import java.util.List;
 
 import lombok.Data;
 import lombok.ToString;
@@ -10,16 +9,28 @@ import lombok.ToString;
 @ToString
 public class RequestCalculadoraDTO {
 	
-	long codCia;
-	long codSecc;
-	long codRamo;
-	long numPol1;
-	long codRies;
-	Date fechaSini;
-	long codCausa;
-	long codCons;
-	long codCob;
-	long valPretension;
+	long compania;
+	long seccion;
+	long producto;
+	String codUser;
+	String numPol;
+	String numSecuPol;
+	Long numEnd;
+	Long codRies;
+	String tdocTercero;
+	String codAseg;
+	String nomAseg;
+	String apeAseg;
+	String fechaSini;
+	String horaSini;
+	String descSini;
+	Long codCausaSini;
+	Long clv;
+	Long modeloRiesgo;
+	Long valorEncuesta;
+	Long codConsSini;
+	Long valorEvidencia;
+	List<CoberturaCalc> cobertura;
 	String validacion;
 	ProcesoCalc proceso;
 

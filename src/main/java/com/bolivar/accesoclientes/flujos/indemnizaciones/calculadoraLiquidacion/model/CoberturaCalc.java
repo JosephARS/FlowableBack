@@ -1,15 +1,16 @@
 package com.bolivar.accesoclientes.flujos.indemnizaciones.calculadoraLiquidacion.model;
 
-import java.util.List;
-
 import lombok.Data;
 import lombok.ToString;
 
 @Data
 @ToString
-public class DetIndemnizar {
+public class CoberturaCalc {
 
-	String titulo;
-	String subTitulo;
-	List<SimTypTexto> simTypTexto;
+	long codCobSini;
+	long valorPretension;
+	long modeloRiesgoPretension;
+	long clasMotorCaso;
+	long motorDefini;
+	
 }

@@ -1,11 +1,8 @@
 package com.bolivar.accesoclientes.flujos.indemnizaciones.crearSiniestroSimon.handler;
 
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -62,12 +59,12 @@ public class GestionarCrearSiniestroSimon implements JavaDelegate{
 			Optional<InfoGeneralProceso> variablesProceso = infoProcesoRepository.findByIdProceso(idProceso);
 			
 			String CREAR_SINIESTRO_SIMON = "spring.profiles.crearSiniestroSimon";
+			String API_KEY = "servicios.crearSiniestroSimon.apiKey";
 			String urlString = env.getProperty(CREAR_SINIESTRO_SIMON);
 			
 			HttpHeaders headers = new HttpHeaders();
-			headers.add("x-api-key", "4Qsus5DlSD8gXesXfEBzN4ZBRrXaw67e4IQ6CFZX");
-			
-			SimpleDateFormat fecha = new SimpleDateFormat("mm-dd-yyyy");
+			headers.add("x-api-key", env.getProperty(API_KEY));
+
 			
 			Optional<Long> numeroSiniestro = Optional.ofNullable(variablesProceso.get().getDocumento().getSiniestro().getNumeroSiniestro());
 			if(numeroSiniestro.isPresent()) {
@@ -90,7 +87,7 @@ public class GestionarCrearSiniestroSimon implements JavaDelegate{
 				String nombre = variablesProceso.get().getDocumento().getAsegurado().getNombres();
 				String apellido = variablesProceso.get().getDocumento().getAsegurado().getApellidos();
 				Date fechaSini = variablesProceso.get().getDocumento().getSiniestro().getFechaSiniestro();
-				long causaCod = Long.parseLong(variablesProceso.get().getDocumento().getInfoProducto().getCausa().get(0).getCodigo());
+				long causaCod = Long.parseLong(variablesProceso.get().getDocumento().getInfoProducto().getCausa().getCodigo());
 				long clv = Long.parseLong(variablesProceso.get().getDocumento().getAsegurado().getClv().getCodigo());
 				long clasificacionCaso = Long.parseLong(variablesProceso.get().getDocumento().getInfoProceso().getClasificacionCaso().getCodigo());
 				long motorDefi = Long.parseLong(variablesProceso.get().getDocumento().getInfoProceso().getResultadoMotorDefi().getCodigo());

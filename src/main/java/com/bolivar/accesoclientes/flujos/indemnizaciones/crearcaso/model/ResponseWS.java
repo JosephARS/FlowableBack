@@ -1,6 +1,5 @@
 package com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.model;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import lombok.Data;

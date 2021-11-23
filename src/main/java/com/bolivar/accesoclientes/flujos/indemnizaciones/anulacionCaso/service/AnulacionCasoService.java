@@ -6,7 +6,6 @@ import java.util.List;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.runtime.Execution;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.springframework.beans.factory.annotation.Autowired;

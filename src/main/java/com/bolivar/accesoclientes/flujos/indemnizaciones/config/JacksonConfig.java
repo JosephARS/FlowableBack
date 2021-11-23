@@ -10,7 +10,12 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 @Configuration
 public class JacksonConfig extends ObjectMapper{
 
-    @Bean
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Bean
     @Primary
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();

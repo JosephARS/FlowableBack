@@ -66,6 +66,7 @@ public class AnulacionCasoControllerTest {
 	    	      .andExpect(status().isOk())
 	    	      .andExpect(jsonPath("$.tipoRespuesta", org.hamcrest.Matchers.is("Exito")))
 	    	      .andReturn();
+	
 		
 	}
 	

@@ -4,10 +4,11 @@ import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +39,7 @@ public class InfoProceso {
 	ObjCodigoValor cambioMotorDef;				//Codigo-Valor
 	String motivoCambioMotorDef;
 	String resultadoPruebaEstres;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	List<Documento> documentos;	  
 	String resultadoEvidencia;
 	Date fechaDesistimiento ;

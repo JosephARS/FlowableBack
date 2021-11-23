@@ -13,8 +13,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.InfoGeneralProceso;
-import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.ObjCodigoValor;
-import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.Tarea;
 
 @Repository
 public interface InfoGeneralProcesoRepository extends JpaRepository<InfoGeneralProceso, Long>{
@@ -82,7 +80,10 @@ public interface InfoGeneralProcesoRepository extends JpaRepository<InfoGeneralP
 	Integer P_ACTUALIZAR_MOTOR_DEF(String id_Proceso, String infoGeneral);
 	
 	@Procedure("p_ingresar_analisis")
-	Integer P_INGRESAR_ANALISIS(String id_Proceso, String infoGeneral);
+	Integer P_INGRESAR_ANALISIS(String id_Proceso, String analisis);
+	
+	@Procedure("p_ingresar_ruta_documento")
+	Integer P_INGRESAR_RUTA_DOCUMENTO(String id_Proceso, String documentosSoporte);
 	
 
 	

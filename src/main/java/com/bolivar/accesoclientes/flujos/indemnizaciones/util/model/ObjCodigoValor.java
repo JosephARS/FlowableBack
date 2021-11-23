@@ -16,6 +16,5 @@ public class ObjCodigoValor implements Serializable {
 	
 	@NotNull
 	String codigo;
-	@NotNull
 	String valor;
 }

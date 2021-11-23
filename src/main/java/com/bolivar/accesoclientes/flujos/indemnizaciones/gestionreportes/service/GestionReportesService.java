@@ -1,18 +1,12 @@
 package com.bolivar.accesoclientes.flujos.indemnizaciones.gestionreportes.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import org.flowable.engine.ManagementService;
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.task.api.Task;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +19,6 @@ import com.bolivar.accesoclientes.flujos.indemnizaciones.gestionreportes.model.D
 import com.bolivar.accesoclientes.flujos.indemnizaciones.gestionreportes.model.ReporteTareasActivas;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.ObjCodigoValor;
 
-import liquibase.pro.packaged.a;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
