@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+  <process id="idIndemnizacionesGen" name="IndemnizacionesGenerales" isExecutable="true">
+    <startEvent id="inicioFlujoGenerales" flowable:formFieldValidation="true"></startEvent>
+    <endEvent id="sid-E3A078F1-42F9-40D4-AA43-1498DAAF60E2"></endEvent>
+    <parallelGateway id="Compuerta1" name="Compuerta 1"></parallelGateway>
+    <userTask id="Tarea1" name="Tarea 1" flowable:formFieldValidation="true"></userTask>
+    <sequenceFlow id="sid-CFFE3734-7763-43B4-B04C-912AB75B0540" sourceRef="Tarea1" targetRef="sid-E3A078F1-42F9-40D4-AA43-1498DAAF60E2"></sequenceFlow>
+    <serviceTask id="NotificacionClienteCreacionDeCaso" name="Notificacion Cliente Creacion De Caso" flowable:class="com.bolivar.accesoclientes.flujos.indemnizaciones.notificacionEventos.handler.HandlerNotificacionCrearCaso"></serviceTask>
+    <endEvent id="sid-9389723C-4735-40AF-A8A8-BF9E670153A4"></endEvent>
+    <sequenceFlow id="sid-002F96AD-A4E3-4ACE-822B-A1F89CF8733A" sourceRef="NotificacionClienteCreacionDeCaso" targetRef="sid-9389723C-4735-40AF-A8A8-BF9E670153A4"></sequenceFlow>
+    <sequenceFlow id="sid-05A0D9D7-7E71-404F-9233-60D00DF94C58" sourceRef="Compuerta1" targetRef="Tarea1"></sequenceFlow>
+    <sequenceFlow id="primerSecuencia" sourceRef="inicioFlujoGenerales" targetRef="Compuerta1"></sequenceFlow>
+    <intermediateCatchEvent id="EventoBDidConsecutivo" name="Evento BD idConsecutivo">
+	  <conditionalEventDefinition>
+	    <condition xsi:type="tFormalExpression">${idConsecutivo != null}</condition>
+	  </conditionalEventDefinition>
+    </intermediateCatchEvent>
+    <sequenceFlow id="sid-2B7538AA-B464-4251-A45B-E18CE1C19DE3" sourceRef="Compuerta1" targetRef="EventoBDidConsecutivo"></sequenceFlow>
+    <sequenceFlow id="sid-0A94B0B2-03C7-41F2-8D86-F360889CABF9" sourceRef="EventoBDidConsecutivo" targetRef="NotificacionClienteCreacionDeCaso"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_idIndemnizacionesGen">
+    <bpmndi:BPMNPlane bpmnElement="idIndemnizacionesGen" id="BPMNPlane_idIndemnizacionesGen">
+      <bpmndi:BPMNShape bpmnElement="inicioFlujoGenerales" id="BPMNShape_inicioFlujoGenerales">
+        <omgdc:Bounds height="30.0" width="30.0" x="100.0" y="163.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-E3A078F1-42F9-40D4-AA43-1498DAAF60E2" id="BPMNShape_sid-E3A078F1-42F9-40D4-AA43-1498DAAF60E2">
+        <omgdc:Bounds height="28.0" width="28.0" x="540.0" y="164.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Compuerta1" id="BPMNShape_Compuerta1">
+        <omgdc:Bounds height="40.0" width="40.0" x="210.0" y="158.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Tarea1" id="BPMNShape_Tarea1">
+        <omgdc:Bounds height="80.0" width="100.0" x="344.5" y="138.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="NotificacionClienteCreacionDeCaso" id="BPMNShape_NotificacionClienteCreacionDeCaso">
+        <omgdc:Bounds height="80.0" width="100.0" x="344.5" y="15.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-9389723C-4735-40AF-A8A8-BF9E670153A4" id="BPMNShape_sid-9389723C-4735-40AF-A8A8-BF9E670153A4">
+        <omgdc:Bounds height="28.0" width="28.0" x="540.0" y="41.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="EventoBDidConsecutivo" id="BPMNShape_EventoBDidConsecutivo">
+        <omgdc:Bounds height="30.0" width="30.0" x="270.0" y="40.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="primerSecuencia" id="BPMNEdge_primerSecuencia">
+        <omgdi:waypoint x="129.94999826100906" y="178.0"></omgdi:waypoint>
+        <omgdi:waypoint x="210.0" y="178.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-CFFE3734-7763-43B4-B04C-912AB75B0540" id="BPMNEdge_sid-CFFE3734-7763-43B4-B04C-912AB75B0540">
+        <omgdi:waypoint x="444.449999999898" y="178.0"></omgdi:waypoint>
+        <omgdi:waypoint x="540.0" y="178.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-0A94B0B2-03C7-41F2-8D86-F360889CABF9" id="BPMNEdge_sid-0A94B0B2-03C7-41F2-8D86-F360889CABF9">
+        <omgdi:waypoint x="299.94999847614224" y="55.0"></omgdi:waypoint>
+        <omgdi:waypoint x="344.5" y="55.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-002F96AD-A4E3-4ACE-822B-A1F89CF8733A" id="BPMNEdge_sid-002F96AD-A4E3-4ACE-822B-A1F89CF8733A">
+        <omgdi:waypoint x="444.45000000000005" y="55.0"></omgdi:waypoint>
+        <omgdi:waypoint x="540.0" y="55.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-05A0D9D7-7E71-404F-9233-60D00DF94C58" id="BPMNEdge_sid-05A0D9D7-7E71-404F-9233-60D00DF94C58">
+        <omgdi:waypoint x="249.55849236641225" y="178.3789808917197"></omgdi:waypoint>
+        <omgdi:waypoint x="309.5" y="178.0"></omgdi:waypoint>
+        <omgdi:waypoint x="344.49999999995543" y="178.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-2B7538AA-B464-4251-A45B-E18CE1C19DE3" id="BPMNEdge_sid-2B7538AA-B464-4251-A45B-E18CE1C19DE3">
+        <omgdi:waypoint x="230.5" y="158.5"></omgdi:waypoint>
+        <omgdi:waypoint x="230.5" y="55.0"></omgdi:waypoint>
+        <omgdi:waypoint x="270.0" y="55.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
