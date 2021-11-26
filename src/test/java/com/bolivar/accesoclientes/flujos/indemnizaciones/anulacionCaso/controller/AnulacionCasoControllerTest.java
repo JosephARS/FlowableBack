@@ -2,14 +2,20 @@ package com.bolivar.accesoclientes.flujos.indemnizaciones.anulacionCaso.controll
 
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
-
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -26,23 +32,42 @@ import com.bolivar.accesoclientes.flujos.indemnizaciones.anulacionCaso.service.A
 import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.model.ResponseWS;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.crearcaso.model.TipoRespuesta;
 import com.bolivar.accesoclientes.flujos.indemnizaciones.util.model.Anulacion;
+import com.bolivar.accesoclientes.flujos.indemnizaciones.util.repository.InfoGeneralProcesoRepository;
+import com.bolivar.accesoclientes.flujos.indemnizaciones.util.repository.UsuariosRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-@WebMvcTest(AnulacionCasoController.class)
+//@WebMvcTest(AnulacionCasoController.class)
 //@ContextConfiguration(classes=AnulacionCasoController.class)
 
-//@SpringBootTest()
+@RunWith(SpringRunner.class)
+@SpringBootTest()
 //@AutoConfigureMockMvc
 public class AnulacionCasoControllerTest {
 	
-    @Autowired
-    private MockMvc mockMvc;
+//    @Autowired
+//    private MockMvc mockMvc;
     
-    @MockBean
-	AnulacionCasoService anulacionCasoService;
+    @Mock
+	InfoGeneralProcesoRepository infoProcesoRepository;
+    @Mock
+    UsuariosRepository usuariosRepository;
+    
+    @Mock
+    AnulacionCasoService anulacionCasoService;
+    
+
+    @InjectMocks
+	AnulacionCasoController anulacionCasoController;
+    
+//    @Before
+//    public void prueba() {
+//    	when(anulacionCasoService.anularCaso(any(), null)))
+//    }
     
     ObjectMapper mapper = new ObjectMapper();
+    
+
 	
 	@Test
 	public void AnularCaso() throws Exception{
@@ -60,12 +85,19 @@ public class AnulacionCasoControllerTest {
     	
     	when(anulacionCasoService.anularCaso(idProceso, datosAnulacion)).thenReturn(oResponseWs);
 
-		mockMvc.perform(put("/api/v1/procesos/anular/{IdProceso}", idProceso)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(mapper.writeValueAsString(datosAnulacion)))
-	    	      .andExpect(status().isOk())
-	    	      .andExpect(jsonPath("$.tipoRespuesta", org.hamcrest.Matchers.is("Exito")))
-	    	      .andReturn();
+    	ResponseWS oResponseWs2 = anulacionCasoController.anularCaso(idProceso, datosAnulacion);
+    	
+    	System.out.println(oResponseWs2.getTipoRespuesta());
+    	
+    	assertEquals(oResponseWs2.getTipoRespuesta(), TipoRespuesta.Exito);
+    	
+    	
+//		mockMvc.perform(put("/api/v1/procesos/anular/{IdProceso}", idProceso)
+//				.contentType(MediaType.APPLICATION_JSON)
+//				.content(mapper.writeValueAsString(datosAnulacion)))
+//	    	      .andExpect(status().isOk())
+//	    	      .andExpect(jsonPath("$.tipoRespuesta", org.hamcrest.Matchers.is("Exito")))
+//	    	      .andReturn();
 	
 		
 	}

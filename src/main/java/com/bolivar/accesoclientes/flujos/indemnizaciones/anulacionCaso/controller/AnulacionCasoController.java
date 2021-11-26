@@ -1,5 +1,6 @@
 package com.bolivar.accesoclientes.flujos.indemnizaciones.anulacionCaso.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,6 +25,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AnulacionCasoController {
 	
+	@Autowired
 	AnulacionCasoService anulacionCasoService;
 	
 	@Operation(summary = "Anular un proceso activo", description = "Anulacion pruebitas")

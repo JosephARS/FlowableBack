@@ -26,7 +26,7 @@ dependencies {
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.4'
 	implementation ('net.sf.jasperreports:jasperreports:6.17.0')
 	implementation 'io.springfox:springfox-boot-starter:3.0.0'
-
+	implementation 'junit:junit:4.13.1'
 
 	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -39,14 +39,38 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
 	
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
+    testImplementation('org.springframework.boot:spring-boot-starter-test') 
+    //{
+    //    exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    //}
 
 
 	
 }
 
+
 test {
-	useJUnitPlatform()
+   useJUnitPlatform()
+   finalizedBy jacocoTestReport
 }
+jacoco {
+   toolVersion = "0.8.5"
+   reportsDir = file("$buildDir/customJacocoReportDir")
+}
+
+jacocoTestReport {
+    dependsOn test 
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.destination file("${buildDir}/jacoco/jacocoTest")
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it,
+                exclude: []
+            )
+        }))
+    }
+}
+test.finalizedBy jacocoTestReport
